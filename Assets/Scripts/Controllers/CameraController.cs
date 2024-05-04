@@ -34,23 +34,10 @@ public class CameraController : MonoBehaviour
         // Clampa el pitch para evitar vuelcos de la cámara
         pitch = Mathf.Clamp(pitch, -89f, 89f);
 
+        player.transform.rotation = Quaternion.Euler(0, yaw, 0);
+
         // Rotate the camera around the player
         UpdateCameraPosition();
-    }
-
-    void RotateCamera()
-    {
-        // Get the horizontal input for camera rotation
-        float rotationInput = Input.GetAxis("Horizontal");
-
-        // Calculate the rotation angle based on input and rotation speed
-        float rotationAngle = rotationInput * rotationSpeed * Time.deltaTime;
-
-        // Rotate the player along the camera
-        player.transform.rotation *= Quaternion.Euler(0, yaw, 0);
-
-        // Rotate the camera with the mouse
-        transform.RotateAround(player.transform.position, Vector3.up, rotationAngle);
     }
 
     void UpdateCameraPosition()

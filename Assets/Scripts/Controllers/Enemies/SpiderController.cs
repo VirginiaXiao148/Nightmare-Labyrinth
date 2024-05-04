@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpiderController : MonoBehaviour{
 
-    public float moveSpeed = 1f; // Speed of enemy movement
+    public float moveSpeed = 3f; // Speed of enemy movement
     private Vector3 moveDirection; // Current movement direction of the enemy
 
     private float changeDirectionInterval = 2f; // Time interval to change movement direction
@@ -26,10 +26,18 @@ public class SpiderController : MonoBehaviour{
 
     private Animation animation; // Reference to the animation component
 
+    private Rigidbody rb;
+
 
     // Start is called before the first frame update
     void Start()
     {
+
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = false;
+        rb.useGravity = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
         currentHealth = maxHealth; // Initialize current health to maximum health
         animation = GetComponent<Animation>(); // Get reference to the Animation component attached to this GameObject
 
@@ -43,6 +51,11 @@ public class SpiderController : MonoBehaviour{
     void Update(){
         // Update the timer
         timer += Time.deltaTime;
+
+        // Mover al enemigo en la dirección establecida a la velocidad configurada
+        //transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        Vector3 newPosition = transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        rb.MovePosition(newPosition);
 
         // If the timer reaches the direction change interval, change the enemy's direction
         if (timer >= changeDirectionInterval)
@@ -71,7 +84,7 @@ public class SpiderController : MonoBehaviour{
 
     bool IsBlocked(Vector3 direction){
         RaycastHit hit;
-        return Physics.Raycast(transform.position, randomDirection, out hit, maxSightDistance);
+        return Physics.Raycast(transform.position, direction, out hit, 1f) && hit.collider.CompareTag("Wall");
     }
     
     // Change the enemy's movement direction to a random direction
@@ -95,17 +108,16 @@ public class SpiderController : MonoBehaviour{
             float randomZ = Random.Range(-1f, 1f);
             randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
 
-            // Check if there's a wall in the new direction
-            RaycastHit hit;
-            if (!Physics.Raycast(transform.position, randomDirection, out hit, maxSightDistance) || !hit.collider.CompareTag("Wall"))
-            {
-                // If no wall is hit or the hit object is not a wall, the direction is valid
+            if (!IsBlocked(randomDirection)){
                 foundValidDirection = true;
             }
         }
 
         // Set the new direction of movement
         moveDirection = randomDirection;
+
+        // Mover al enemigo en la dirección establecida a la velocidad configurada
+        //transform.position += moveDirection * moveSpeed * Time.deltaTime;
 
         // Rotate the enemy to face the new direction
         transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
@@ -147,9 +159,9 @@ public class SpiderController : MonoBehaviour{
             // If "Run" animation is not playing, play it
             PlayRunAnimation();
         }
-
-        // Move the spider towards the player's position at a constant speed
-        transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+        
+        Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+        rb.MovePosition(newPosition);
     }
 
 

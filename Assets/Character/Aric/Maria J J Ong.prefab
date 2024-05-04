@@ -64,6 +64,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Maria J J Ong
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b53941bd99645b14aa9a27eb8ef7926a, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: b53941bd99645b14aa9a27eb8ef7926a, type: 3}
       propertyPath: m_Controller
       value: 

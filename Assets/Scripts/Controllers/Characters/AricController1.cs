@@ -20,7 +20,7 @@ public class AricController1 : MonoBehaviour
     // Player movement variables
     private Vector3 playerVelocity;
     private bool groundedPlayer;
-    private float playerSpeed = 0.3f;
+    private float playerSpeed = 3f;
     private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
 
@@ -68,18 +68,29 @@ public class AricController1 : MonoBehaviour
             playerVelocity.y = 0f;
         }
 
-        // Get input for player movement
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        // Obtener las entradas de movimiento relativas al jugador
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
 
-        // Move the player based on input
-        controller.Move(move * Time.deltaTime * playerSpeed);
+        // Convertir las entradas en un vector de movimiento basado en la orientación de la cámara
+        Vector3 forward = mainCamera.transform.forward;
+        Vector3 right = mainCamera.transform.right;
+        forward.y = 0; // Asegurar que el movimiento no tenga componente vertical
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
 
-        /**
-         * // Rotate the player to face the movement direction
-        if (move != Vector3.zero)
-        {
-            gameObject.transform.forward = move;
-        }**/
+        // Vector de movimiento basado en la cámara
+        Vector3 moveDirection = forward * vertical + right * horizontal;
+
+        // Mover el personaje
+        controller.Move(moveDirection * playerSpeed * Time.deltaTime);
+
+        // Rotar al personaje para que mire en la dirección de movimiento
+        if (moveDirection != Vector3.zero) {
+            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+        }
 
         // Jumping mechanism
         if (Input.GetButtonDown("Jump") && groundedPlayer)
@@ -93,26 +104,11 @@ public class AricController1 : MonoBehaviour
         // Apply vertical movement to the player
         controller.Move(playerVelocity * Time.deltaTime);
 
-        // Rotate the player based on the rotation of the camera
-        //RotatePlayer();
-
         // The character will display the animations
         HandleAnimations();
 
         // Handle player attack
         HandleAttack();
-    }
-
-    void RotatePlayer()
-    {
-        // Get the horizontal input for player rotation
-        float rotationInput = Input.GetAxis("Horizontal");
-
-        // Calculate the rotation angle based on input and rotation speed
-        float rotationAngle = rotationInput * rotationSpeed * Time.deltaTime;
-
-        // Rotate the player around the y-axis based on the camera's rotation
-        transform.Rotate(Vector3.up, rotationAngle * mainCamera.transform.rotation.eulerAngles.y);
     }
 
     void HandleAnimations(){
@@ -130,15 +126,15 @@ public class AricController1 : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             // Raycast desde la posici�n del rat�n para detectar objetos en el mundo
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
                 // Comprueba si el objeto clicado es un enemigo u otro objetivo v�lido para el ataque
-                if (hit.collider.CompareTag("Spider"))
+                if (hit.collider.CompareTag("Enemy"))
                 {
-                    // Activa la animaci�n de ataque del personaje
+                    // Activa la animación de ataque del personaje
                     animator.SetTrigger("Attack");
 
                     // Aplica efectos de ataque al enemigo, como da�o
@@ -148,33 +144,6 @@ public class AricController1 : MonoBehaviour
                         spiderController.TakeDamage(attackDamage);
                     }
                 }
-
-                /**
-                 * 
-                 * else if (hit.collider.CompareTag("Phantom"))
-                {
-                    // Activa la animaci�n de ataque del personaje
-                    animator.SetTrigger("Attack");
-
-                    // Aplica efectos de ataque al enemigo, como da�o
-                    EnemyController enemy = hit.collider.GetComponent<EnemyController>();
-                    if (enemy != null)
-                    {
-                        enemy.TakeDamage(attackDamage);
-                    }
-                } else if (hit.collider.CompareTag("Illusion"))
-                {
-                    // Activa la animaci�n de ataque del personaje
-                    animator.SetTrigger("Attack");
-
-                    // Aplica efectos de ataque al enemigo, como da�o
-                    EnemyController enemy = hit.collider.GetComponent<EnemyController>();
-                    if (enemy != null)
-                    {
-                        enemy.TakeDamage(attackDamage);
-                    }
-                }
-                 * **/
             }
         }
     }
