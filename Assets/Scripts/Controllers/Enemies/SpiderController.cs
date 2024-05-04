@@ -10,12 +10,14 @@ public class SpiderController : MonoBehaviour{
     private float changeDirectionInterval = 2f; // Time interval to change movement direction
     private float timer; // Timer to control direction change
 
-    public int maxHealth = 30;
+    public int maxHealthSpider = 30;
 
     public float attackRange = 1f;
     public int attackDamage = 5;
     public float attackCooldown = 2f; // Time between attacks
     private float lastAttackTime; // Time of the last attack
+
+    public string id;
 
     public float fieldOfViewAngle = 90f; // Enemy's field of view angle (in degrees)
     public float maxSightDistance = 10f; // Maximum distance at which the enemy can detect the player
@@ -35,17 +37,20 @@ public class SpiderController : MonoBehaviour{
 
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
-        rb.useGravity = false;
+        rb.useGravity = true;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        currentHealth = maxHealth; // Initialize current health to maximum health
+        id = System.Guid.NewGuid().ToString();
+
+        currentHealth = maxHealthSpider; // Initialize current health to maximum health
         animation = GetComponent<Animation>(); // Get reference to the Animation component attached to this GameObject
 
         player = GameObject.FindGameObjectWithTag("Player").transform; // Find and store a reference to the player's transform
-        currentHealth = maxHealth; // Reset current health to maximum health
 
         // Initially, assign a random movement direction to the enemy
         ChangeDirection();
+
+        Debug.Log("Current health "+currentHealth);
     }
 
     void Update(){
@@ -80,6 +85,13 @@ public class SpiderController : MonoBehaviour{
             }
         }
 
+        Debug.Log(getLife());
+
+    }
+
+    string getLife(){
+        string txt = "Araña " + id + " y su vida es " + currentHealth;
+        return txt;
     }
 
     bool IsBlocked(Vector3 direction){
@@ -167,14 +179,22 @@ public class SpiderController : MonoBehaviour{
 
     void AttackPlayer()
     {
-        // Play the attack animation
-        animation.Play("Attack");
-
-        // Deal damage to the player (you should call a function in the player's script to handle damage logic)
-        player.GetComponent<AricController1>().TakeDamage(attackDamage);
-
-        // Record the time of the last attack
-        lastAttackTime = Time.time;
+        Vector3 directionToPlayer = player.position - transform.position;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, directionToPlayer, out hit, maxSightDistance))
+        {
+            Debug.Log("Hit: " + hit.collider.name);  // Esto te dirá qué objeto está golpeando el raycast
+            if (hit.collider.CompareTag("Player"))
+            {
+                Debug.Log("Player in sight and hit by raycast");
+                // Play the attack animation
+                animation.Play("Attack");
+                // Deal damage to the player (you should call a function in the player's script to handle damage logic)
+                player.GetComponent<AricController1>().TakeDamage(attackDamage);
+                // Record the time of the last attack
+                lastAttackTime = Time.time;
+            }
+        }
     }
 
 
@@ -192,42 +212,39 @@ public class SpiderController : MonoBehaviour{
         {
             // Decrease the enemy's health by the specified damage amount
             currentHealth -= damage;
+            Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
 
             // Check if the enemy's health has reached zero or below
             if (currentHealth <= 0)
             {
+                Debug.Log("The enemy has no health left ");
                 // If health is zero or below, call the Die function
                 Die();
             }
             else
             {
                 Debug.Log("Enemy took damage!");
-
-                // Activate temporary invulnerability
-                isInvulnerable = true;
-
-                // Invoke the ResetInvulnerability function after a specified duration
-                Invoke("ResetInvulnerability", invulnerabilityTime);
+                StartCoroutine(BecomeTemporarilyInvulnerable());
             }
         }
     }
 
-    // Disable invulnerability
-    void ResetInvulnerability()
+    private IEnumerator BecomeTemporarilyInvulnerable()
     {
+        isInvulnerable = true;
+        yield return new WaitForSeconds(invulnerabilityTime);
         isInvulnerable = false;
     }
 
     void Die()
     {
-        // Implement the logic when the enemy dies
         Debug.Log("Enemy died!");
 
         // If health reaches zero, play the death animation
         animation.Play("Death");
 
-        // Destroy the enemy GameObject
-        Destroy(gameObject);
+        // disable the gameobject
+        gameObject.SetActive(false);
     }
 
     // Method to play the walk animation

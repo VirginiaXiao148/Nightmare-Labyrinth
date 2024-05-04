@@ -109,6 +109,14 @@ public class AricController1 : MonoBehaviour
 
         // Handle player attack
         HandleAttack();
+
+        // Print the health of characters
+        Debug.Log(this.getHealth());
+    }
+
+    string getHealth(){
+        string value_health = "MainP: " + this.currentHealth;
+        return value_health;
     }
 
     void HandleAnimations(){
@@ -125,24 +133,19 @@ public class AricController1 : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // Raycast desde la posici�n del rat�n para detectar objetos en el mundo
+            Debug.Log("Attempt to attack");
+            Debug.Log("Mouse button pressed");
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, 5f))
             {
-                // Comprueba si el objeto clicado es un enemigo u otro objetivo v�lido para el ataque
-                if (hit.collider.CompareTag("Enemy"))
+                Debug.Log("Raycast hit: " + hit.collider.name);
+                SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
+                if (spiderController != null)
                 {
-                    // Activa la animación de ataque del personaje
+                    spiderController.TakeDamage(attackDamage);
                     animator.SetTrigger("Attack");
-
-                    // Aplica efectos de ataque al enemigo, como da�o
-                    SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
-                    if (spiderController != null)
-                    {
-                        spiderController.TakeDamage(attackDamage);
-                    }
+                    Debug.Log("Enemy hit");
                 }
             }
         }
@@ -170,5 +173,4 @@ public class AricController1 : MonoBehaviour
         // Add code here to handle player death, such as restarting the level or displaying a game over screen
         Debug.Log("Player died!");
     }
-
 }
