@@ -240,9 +240,6 @@ public class SpiderController : MonoBehaviour{
     {
         Debug.Log("Enemy died!");
 
-        // If health reaches zero, play the death animation
-        animation.Play("Death");
-
         // disable the gameobject
         gameObject.SetActive(false);
     }

@@ -137,6 +137,7 @@ public class AricController1 : MonoBehaviour
             Debug.Log("Mouse button pressed");
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+            animator.SetTrigger("Attack");
             if (Physics.Raycast(ray, out hit, 5f))
             {
                 Debug.Log("Raycast hit: " + hit.collider.name);
@@ -144,7 +145,7 @@ public class AricController1 : MonoBehaviour
                 if (spiderController != null)
                 {
                     spiderController.TakeDamage(attackDamage);
-                    animator.SetTrigger("Attack");
+                    
                     Debug.Log("Enemy hit");
                 }
             }
@@ -154,12 +155,11 @@ public class AricController1 : MonoBehaviour
     // Method to apply damage to the player
     public void TakeDamage(int damageAmount)
     {
-        // We set the damage the character has taken from the enemies
-        animator.SetInteger("DamageTaken", currentHealth);
+        Debug.Log("El personaje ha sufrido daño" + damageAmount);
         // Reduce health by damage amount
         currentHealth -= damageAmount;
         // Update the health of the character
-        animator.SetInteger("Health", currentHealth);
+        animator.SetInteger("DamageTaken", damageAmount);
         // Check if the player is dead
         if (currentHealth <= 0)
         {
@@ -172,5 +172,6 @@ public class AricController1 : MonoBehaviour
     {
         // Add code here to handle player death, such as restarting the level or displaying a game over screen
         Debug.Log("Player died!");
+        gameObject.SetActive(false);
     }
 }

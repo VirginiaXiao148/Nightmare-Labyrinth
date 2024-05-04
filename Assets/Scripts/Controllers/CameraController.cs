@@ -4,7 +4,7 @@ public class CameraController : MonoBehaviour
 {
     public GameObject player; // Reference to the player GameObject
 
-    public float distance = 2.0f; // Vector representing the distance between the camera and the player
+    public float distance = 1.0f; // Vector representing the distance between the camera and the player
 
     public float rotationSpeed = 5f; // Speed at which the camera rotates
 
@@ -17,6 +17,11 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Bloquea el cursor en el centro de la pantalla
+        Cursor.lockState = CursorLockMode.Locked;
+        // Oculta el cursor
+        Cursor.visible = true;
+
         // Inicializa la rotación y posición de la cámara
         yaw = transform.eulerAngles.y;
         pitch = transform.eulerAngles.x;
