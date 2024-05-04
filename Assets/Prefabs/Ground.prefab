@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 3524719660390646014}
   - component: {fileID: 910212163775569747}
   - component: {fileID: 1590875144805016271}
+  - component: {fileID: 2875827417173319197}
+  - component: {fileID: 1025946647561613846}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -110,6 +112,43 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &2875827417173319197
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317807124206353508}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 2.220446e-16, z: 10}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1025946647561613846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317807124206353508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51724db6dcc1c1549a2bb36397e9f67a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topWall: {fileID: 8210120730579522468}
+  rightWall: {fileID: 4559451869153895325}
+  bottomWall: {fileID: 1769445581481047046}
+  leftWall: {fileID: 6184048240146098305}
 --- !u!1 &1769445581481047046
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +267,7 @@ GameObject:
   - component: {fileID: 2188269139199234255}
   - component: {fileID: 1467233253159730368}
   m_Layer: 0
-  m_Name: TopWall
+  m_Name: RightWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -333,7 +372,7 @@ GameObject:
   - component: {fileID: 5427402501066022106}
   - component: {fileID: 9116291955662665237}
   m_Layer: 0
-  m_Name: ' RightWall'
+  m_Name: LeftWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -438,7 +477,7 @@ GameObject:
   - component: {fileID: 1590448652257283832}
   - component: {fileID: 3961869776411529413}
   m_Layer: 0
-  m_Name: LeftWall
+  m_Name: TopWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
