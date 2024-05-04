@@ -40,15 +40,12 @@ public class MazeGenerator : MonoBehaviour{
 
     }
 
-    List<Direction> directions = new List<Direction> {
-
+    private List<Direction> directions = new List<Direction> {
         Direction.Up, Direction.Down, Direction.Left, Direction.Right
-
     };
 
-    List<Direction> GetRandomDirection()
+    private List<Direction> GetRandomDirection()
     {
-
         List<Direction> copyDirections = new List<Direction>(directions);
         List<Direction> randomDirections = new List<Direction>();
 
@@ -59,69 +56,53 @@ public class MazeGenerator : MonoBehaviour{
             copyDirections.RemoveAt(randomIndex);
         }
 
-
         return randomDirections;
     }
 
     bool IsCellValid(int x, int y)
     {
-
-        if (x < 0 || x > mazeWidth - 1 || y < 0 || y > mazeHeight - 1 || maze[x, y].visited)
-        {
-
-            return false;
-
-        }
-        else
-        {
-
-            return true;
-
-        }
+        if (x < 0 || x >= mazeWidth || y < 0 || y >= mazeHeight)
+    {
+        return false;
+    }
+    return !maze[x, y].visited;
 
     }
 
     Vector2Int CheckNeighbour()
     {
-
+        // Get random directions
         List<Direction> rndDir = GetRandomDirection();
-        Vector2Int neighbour = currentCell;
 
-        for (int i = 0; i < rndDir.Count; i++)
+        foreach (Direction dir in rndDir)
         {
+            // Set the neighbour
+            Vector2Int neighbour = currentCell;
 
-            switch (rndDir[i])
+            switch (dir)
             {
                 case Direction.Up:
-
                     neighbour.y++;
                     break;
-
                 case Direction.Down:
-
                     neighbour.y--;
                     break;
-
                 case Direction.Left:
-
                     neighbour.x--;
                     break;
-
                 case Direction.Right:
-
                     neighbour.x++;
                     break;
-
             }
 
+            // Check the cell is valid
             if (IsCellValid(neighbour.x, neighbour.y))
             {
-
                 return neighbour;
-
             }
         }
 
+        // Return the current cell if neighbour is not valid
         return currentCell;
 
     }

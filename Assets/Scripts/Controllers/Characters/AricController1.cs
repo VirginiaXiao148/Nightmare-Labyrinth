@@ -32,8 +32,14 @@ public class AricController1 : MonoBehaviour
     // Called when the script is initialized
     private void Start()
     {
-
+        // Set the current health
         currentHealth = maxHealth;
+
+        // Get the Animator component attached to the GameObject
+        animator = gameObject.GetComponent<Animator>();
+
+        // We set the health of the character
+        animator.SetInteger("Health", currentHealth);
 
         mazeGenerator = GameObject.FindObjectOfType<MazeGenerator>();
 
@@ -48,11 +54,6 @@ public class AricController1 : MonoBehaviour
 
         // Get the CharacterController component attached to the GameObject
         controller = gameObject.GetComponent<CharacterController>();
-
-        // Get the Animator component attached to the GameObject
-        animator = gameObject.GetComponent<Animator>();
-
-        //Forward = Backward = Right = Left = false;
     }
 
     // Called every frame
@@ -181,9 +182,12 @@ public class AricController1 : MonoBehaviour
     // Method to apply damage to the player
     public void TakeDamage(int damageAmount)
     {
+        // We set the damage the character has taken from the enemies
+        animator.SetInteger("DamageTaken", currentHealth);
         // Reduce health by damage amount
         currentHealth -= damageAmount;
-
+        // Update the health of the character
+        animator.SetInteger("Health", currentHealth);
         // Check if the player is dead
         if (currentHealth <= 0)
         {

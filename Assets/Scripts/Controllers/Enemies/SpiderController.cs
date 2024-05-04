@@ -10,7 +10,7 @@ public class SpiderController : MonoBehaviour{
     private float changeDirectionInterval = 2f; // Time interval to change movement direction
     private float timer; // Timer to control direction change
 
-    public int maxHealth = 10;
+    public int maxHealth = 30;
 
     public float attackRange = 1f;
     public int attackDamage = 5;
@@ -32,10 +32,8 @@ public class SpiderController : MonoBehaviour{
     {
         currentHealth = maxHealth; // Initialize current health to maximum health
         animation = GetComponent<Animation>(); // Get reference to the Animation component attached to this GameObject
-                                               
-        //PlayIdleAnimation();                   // Start with the default idle animation
 
-        //player = GameObject.FindGameObjectWithTag("Player").transform; // Find and store a reference to the player's transform
+        player = GameObject.FindGameObjectWithTag("Player").transform; // Find and store a reference to the player's transform
         currentHealth = maxHealth; // Reset current health to maximum health
 
         // Initially, assign a random movement direction to the enemy
@@ -43,27 +41,6 @@ public class SpiderController : MonoBehaviour{
     }
 
     void Update(){
-
-        // Check if the player is within the enemy's field of view
-        /* if (IsPlayerInSight())
-        {
-            // If the player is within the enemy's field of view, follow them
-            FollowPlayer();
-
-            // Check if the player is within attack range
-            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-            if (distanceToPlayer <= attackRange)
-            {
-                // Perform the attack if enough time has passed since the last attack
-                if (Time.time - lastAttackTime >= attackCooldown)
-                {
-                    AttackPlayer();
-                }
-            }
-        } else {
-            ChangeDirection();
-        } */
-
         // Update the timer
         timer += Time.deltaTime;
 
@@ -75,50 +52,62 @@ public class SpiderController : MonoBehaviour{
             timer = 0f;
         }
 
+        //check if the is in sight
+        if (IsPlayerInSight()){
+            // calculate the distance between the enemy and the player
+            float distanceToPlayer = Vector3.Distance(transform.position,player.position);
+
+            if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+            {
+                AttackPlayer(); // Attack the player
+            }
+            else if (distanceToPlayer > attackRange)
+            {
+                FollowPlayer(); // Follow the player
+            }
+        }
+
+    }
+
+    bool IsBlocked(Vector3 direction){
+        RaycastHit hit;
+        return Physics.Raycast(transform.position, randomDirection, out hit, maxSightDistance);
     }
     
     // Change the enemy's movement direction to a random direction
     void ChangeDirection()
     {
+        // Check if the "Walk" animation is not playing
         if (!animation.IsPlaying("Walk"))
         {
-            // If "Walk" animation is not playing, play it
-            PlayWalkAnimation(); ;
+            // If not playing, play the "Walk" animation
+            PlayWalkAnimation();
         }
 
-        Vector3[] possibleDirections = { transform.forward, -transform.forward, transform.right, -transform.right };
-        Vector3 moveDirection = Vector3.zero;
         bool foundValidDirection = false;
+        Vector3 randomDirection = Vector3.zero;
 
+        // Keep searching for a valid direction until one is found
         while (!foundValidDirection)
         {
-            Vector3 randomDirection = Random.onUnitSphere; // Dirección aleatoria en 3D
+            // Generate a new random direction in the XY plane (horizontal)
+            float randomX = Random.Range(-1f, 1f);
+            float randomZ = Random.Range(-1f, 1f);
+            randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
 
-            foreach (Vector3 direction in possibleDirections)
+            // Check if there's a wall in the new direction
+            RaycastHit hit;
+            if (!Physics.Raycast(transform.position, randomDirection, out hit, maxSightDistance) || !hit.collider.CompareTag("Wall"))
             {
-                RaycastHit hit;
-                if (Physics.Raycast(transform.position, direction, out hit, maxSightDistance))
-                {
-                    if (hit.collider.CompareTag("Wall"))
-                    {
-                        moveDirection = randomDirection; // Cambia la dirección del movimiento
-                        foundValidDirection = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!foundValidDirection)
-            {
-                // Si ninguna dirección es válida, elige una aleatoria
-                moveDirection = randomDirection;
+                // If no wall is hit or the hit object is not a wall, the direction is valid
                 foundValidDirection = true;
             }
         }
 
-        // Mover y rotar el enemigo una vez por frame
-        transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
-        //transform.position += moveDirection;
+        // Set the new direction of movement
+        moveDirection = randomDirection;
+
+        // Rotate the enemy to face the new direction
         transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
     }
 
