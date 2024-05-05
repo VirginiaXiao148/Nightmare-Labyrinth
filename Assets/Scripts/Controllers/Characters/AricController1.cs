@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AricController1 : MonoBehaviour
 {
@@ -11,7 +12,9 @@ public class AricController1 : MonoBehaviour
     // Reference to the main camera
     public Camera mainCamera;
 
-    public int maxHealth = 100;
+    public int maxHealth = 100; // Health of the player
+    public Image healthBar; // Reference to the health bar image
+    public Text healthText; // Reference to the health text
     public int attackDamage = 10;
     public float attackRange = 1.5f; // Rango de ataque
     int currentHealth;
@@ -184,6 +187,14 @@ public class AricController1 : MonoBehaviour
             Die();
         }
         StartCoroutine(ResetTakeDamageAnimation());
+    }
+
+    void UpdateHealth()
+    {
+        // Update the health bar
+        healthBar.fillAmount = (float) currentHealth / maxHealth;
+        // Update the health text
+        healthText.text = currentHealth.ToString();
     }
 
     private IEnumerator ResetTakeDamageAnimation(){

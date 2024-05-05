@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpiderController : MonoBehaviour{
 
@@ -12,7 +13,9 @@ public class SpiderController : MonoBehaviour{
     private float changeDirectionInterval = 2f; // Time interval to change movement direction
     private float timer; // Timer to control direction change
 
-    public int maxHealthSpider = 30;
+    public float maxHealthSpider = 30;
+    public Image healthBar; // Reference to the health bar image
+    public Text healthText; // Reference to the health text
 
     public float attackRange = 1.5f;
     public int attackDamage = 5;
@@ -24,7 +27,7 @@ public class SpiderController : MonoBehaviour{
     public float fieldOfViewAngle = 90f; // Enemy's field of view angle (in degrees)
     public float maxSightDistance = 10f; // Maximum distance at which the enemy can detect the player
 
-    private int currentHealth; // Current health of the enemy
+    private float currentHealth; // Current health of the enemy
 
     private Transform player; // Reference to the player's transform
 
@@ -78,12 +81,21 @@ public class SpiderController : MonoBehaviour{
         }
 
         Debug.Log(getLife());
-
+        UpdateHealth();
     }
 
     string getLife(){
         string txt = "Araña " + id + " y su vida es " + currentHealth;
         return txt;
+    }
+
+    void UpdateHealth()
+    {
+        // Update the health bar
+        healthBar.fillAmount = (float) currentHealth / maxHealthSpider;
+        string txt = "Araña " + id + " y su vida es " + currentHealth.ToString();
+        // Update the health text
+        healthText.text = txt;
     }
 
     bool IsBlocked(Vector3 direction){
@@ -191,7 +203,7 @@ public class SpiderController : MonoBehaviour{
     private float knockbackForce = 5f; // Force of the knockback effect
 
     // Function to handle when the enemy takes damage
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         // This stops all animations that are currently playing
         GetComponent<Animation>().Stop();
