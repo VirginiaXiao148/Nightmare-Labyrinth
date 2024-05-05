@@ -12,22 +12,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+    - name: Setup Unity
+      uses: game-ci/unity-setup@v2
       with:
-        dotnet-version: '5.0.x' # .NET 5.0 is compatible with C# 9.0
-
-    - name: Restore dependencies
-      run: dotnet restore
+        unity-version: '2020.3.12f1' # replace with your Unity version
 
     - name: Build
-      run: dotnet build --configuration Release
-
-    - name: Test
-      run: dotnet test --verbosity normal
-
-    - name: Publish
-      run: dotnet publish --configuration Release --no-build --output ./published
+      run: |
+        /opt/Unity/Editor/Unity \
+          -batchmode \
+          -nographics \
+          -silent-crashes \
+          -logFile \
+          -quit \
+          -buildWindows64Player ./published/game.exe
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
