@@ -15,7 +15,7 @@ jobs:
     - name: Setup Unity
       uses: game-ci/unity-setup@v2
       with:
-        unity-version: '2020.3.12f1' # replace with your Unity version
+        unity-version: '2022.3.26f1' # replace with your Unity version
 
     - name: Build
       run: |
