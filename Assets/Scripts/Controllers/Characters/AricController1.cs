@@ -23,7 +23,7 @@ public class AricController1 : MonoBehaviour
     private Vector3 playerVelocity;
     private bool groundedPlayer;
     private float playerSpeed = 3f;
-    private float jumpHeight = 1.0f;
+    private float jumpHeight = 0.5f;
     private float gravityValue = -9.81f;
 
     //bool Forward, Backward, Right, Left;
@@ -34,6 +34,13 @@ public class AricController1 : MonoBehaviour
     // Called when the script is initialized
     private void Start()
     {
+
+        // Hace el cursor visible
+        Cursor.visible = true;
+
+        // Desbloquea el cursor para permitir el movimiento libre
+        Cursor.lockState = CursorLockMode.None;
+
         // Set the current health
         currentHealth = maxHealth;
 

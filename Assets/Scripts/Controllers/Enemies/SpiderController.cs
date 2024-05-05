@@ -197,43 +197,27 @@ public class SpiderController : MonoBehaviour{
         }
     }
 
-
-    // Variable to track if the enemy is currently invulnerable
-    private bool isInvulnerable = false;
-
-    // Time duration for the enemy's invulnerability
-    public float invulnerabilityTime = 5f;
+    private float knockbackForce = 5f; // Force of the knockback effect
 
     // Function to handle when the enemy takes damage
     public void TakeDamage(int damage)
     {
-        // Check if the enemy is not currently invulnerable
-        if (!isInvulnerable)
+        // This stops all animations that are currently playing
+        GetComponent<Animation>().Stop();
+        // Decrease the enemy's health by the specified damage amount
+        currentHealth -= damage;
+        Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
+        // Knockback the enemy when taking damage
+        // Calculate the knockback direction
+        Vector3 knockbackDirection = (transform.position - player.position).normalized;
+        rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+        // Check if the enemy's health has reached zero or below
+        if (currentHealth <= 0)
         {
-            // Decrease the enemy's health by the specified damage amount
-            currentHealth -= damage;
-            Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
-
-            // Check if the enemy's health has reached zero or below
-            if (currentHealth <= 0)
-            {
-                Debug.Log("The enemy has no health left ");
-                // If health is zero or below, call the Die function
-                Die();
-            }
-            else
-            {
-                Debug.Log("Enemy took damage!");
-                StartCoroutine(BecomeTemporarilyInvulnerable());
-            }
+            Debug.Log("The enemy has no health left ");
+            // If health is zero or below, call the Die function
+            Die();
         }
-    }
-
-    private IEnumerator BecomeTemporarilyInvulnerable()
-    {
-        isInvulnerable = true;
-        yield return new WaitForSeconds(invulnerabilityTime);
-        isInvulnerable = false;
     }
 
     void Die()

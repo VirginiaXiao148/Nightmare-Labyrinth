@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraController1 : MonoBehaviour
 {
     public GameObject player; // Reference to the player GameObject
 
-    public float distance = 0.5f; // Vector representing the distance between the camera and the player
+    public float distance = 2.0f; // Vector representing the distance between the camera and the player
 
     public float rotationSpeed = 5f; // Speed at which the camera rotates
 
@@ -17,11 +17,10 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Bloquea el cursor en el centro de la pantalla
-        Cursor.lockState = CursorLockMode.Locked;
-        // Oculta el cursor
-        Cursor.visible = true;
 
+        Cursor.lockState = CursorLockMode.Locked; // Locks the cursor in the center of the screen
+        Cursor.visible = false; // Hides the cursor for a more immersive camera control
+        
         // Inicializa la rotación y posición de la cámara
         yaw = transform.eulerAngles.y;
         pitch = transform.eulerAngles.x;
@@ -39,11 +38,25 @@ public class CameraController : MonoBehaviour
         // Clampa el pitch para evitar vuelcos de la cámara
         pitch = Mathf.Clamp(pitch, -89f, 89f);
 
-        player.transform.rotation = Quaternion.Euler(0, yaw, 0);
-
         // Rotate the camera around the player
         UpdateCameraPosition();
+        RotateCamera();
     }
+
+    void RotateCamera()
+{
+    // Obtener la entrada horizontal para la rotación del jugador
+    float rotationInput = Input.GetAxis("Horizontal");
+
+    // Calcular el ángulo de rotación basado en la entrada y la velocidad de rotación
+    float rotationAngle = rotationInput * rotationSpeed * Time.deltaTime;
+
+    // Rotar el jugador
+    player.transform.rotation = Quaternion.Euler(0, yaw, 0);
+
+    // Rotar la cámara alrededor del jugador si es necesario (opcional)
+    // transform.RotateAround(player.transform.position, Vector3.up, rotationAngle);
+}
 
     void UpdateCameraPosition()
     {
