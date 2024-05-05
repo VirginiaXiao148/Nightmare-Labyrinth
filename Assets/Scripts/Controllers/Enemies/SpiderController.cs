@@ -96,7 +96,7 @@ public class SpiderController : MonoBehaviour{
 
     bool IsBlocked(Vector3 direction){
         RaycastHit hit;
-        return Physics.Raycast(transform.position, direction, out hit, 1f) && hit.collider.CompareTag("Wall");
+        return Physics.Raycast(transform.position, direction, out hit, 7f) && hit.collider.CompareTag("Wall");
     }
     
     // Change the enemy's movement direction to a random direction
