@@ -13,9 +13,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Setup Unity
-      uses: game-ci/unity-setup@v2
+      uses: game-ci/unity-setup@v2.0.1  # Corrected version number
       with:
-        unity-version: '2022.3.26f1' # replace with your Unity version
+        unity-version: '2022.3.26f1'  # replace with your Unity version
 
     - name: Build
       run: |
