@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AricController1 : MonoBehaviour
@@ -152,6 +154,7 @@ public class AricController1 : MonoBehaviour
         }
     }
 
+    public float animationTime = 5f;
     // Method to apply damage to the player
     public void TakeDamage(int damageAmount)
     {
@@ -159,17 +162,24 @@ public class AricController1 : MonoBehaviour
         // Reduce health by damage amount
         currentHealth -= damageAmount;
         // Update the health of the character
-        animator.SetInteger("DamageTaken", damageAmount);
+        animator.SetBool("DamageTaken",true);
         // Check if the player is dead
         if (currentHealth <= 0)
         {
             Die();
         }
+        StartCoroutine(ResetTakeDamageAnimation());
+    }
+
+    private IEnumerator ResetTakeDamageAnimation(){
+        yield return new WaitForSeconds(animationTime);
+        animator.SetBool("DamageTaken",false);
     }
 
     // Method to handle player death
     void Die()
     {
+        animator.SetBool("Death",true);
         // Add code here to handle player death, such as restarting the level or displaying a game over screen
         Debug.Log("Player died!");
         gameObject.SetActive(false);

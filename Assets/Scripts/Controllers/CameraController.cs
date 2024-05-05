@@ -4,7 +4,7 @@ public class CameraController : MonoBehaviour
 {
     public GameObject player; // Reference to the player GameObject
 
-    public float distance = 1.0f; // Vector representing the distance between the camera and the player
+    public float distance = 0.5f; // Vector representing the distance between the camera and the player
 
     public float rotationSpeed = 5f; // Speed at which the camera rotates
 
