@@ -7,12 +7,14 @@ public class SpiderController : MonoBehaviour{
     public float moveSpeed = 3f; // Speed of enemy movement
     private Vector3 moveDirection; // Current movement direction of the enemy
 
+    private bool isStunned = false;
+
     private float changeDirectionInterval = 2f; // Time interval to change movement direction
     private float timer; // Timer to control direction change
 
     public int maxHealthSpider = 30;
 
-    public float attackRange = 1f;
+    public float attackRange = 1.5f;
     public int attackDamage = 5;
     public float attackCooldown = 2f; // Time between attacks
     private float lastAttackTime; // Time of the last attack
@@ -54,34 +56,24 @@ public class SpiderController : MonoBehaviour{
     }
 
     void Update(){
-        // Update the timer
-        timer += Time.deltaTime;
 
-        // Mover al enemigo en la dirección establecida a la velocidad configurada
-        //transform.position += moveDirection * moveSpeed * Time.deltaTime;
-        Vector3 newPosition = transform.position += moveDirection * moveSpeed * Time.deltaTime;
-        rb.MovePosition(newPosition);
-
-        // If the timer reaches the direction change interval, change the enemy's direction
-        if (timer >= changeDirectionInterval)
-        {
-            ChangeDirection();
-            // Reset the timer
-            timer = 0f;
-        }
-
-        //check if the is in sight
-        if (IsPlayerInSight()){
-            // calculate the distance between the enemy and the player
-            float distanceToPlayer = Vector3.Distance(transform.position,player.position);
-
-            if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
-            {
-                AttackPlayer(); // Attack the player
+        if (!isStunned) {
+            // Todo tu código de movimiento y seguimiento del jugador
+            timer += Time.deltaTime;
+            Vector3 newPosition = transform.position += moveDirection * moveSpeed * Time.deltaTime;
+            rb.MovePosition(newPosition);
+            if (timer >= changeDirectionInterval) {
+                ChangeDirection();
+                timer = 0f;
             }
-            else if (distanceToPlayer > attackRange)
-            {
-                FollowPlayer(); // Follow the player
+
+            if (IsPlayerInSight()) {
+                float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown) {
+                    AttackPlayer();
+                } else if (distanceToPlayer > attackRange) {
+                    FollowPlayer();
+                }
             }
         }
 
@@ -96,7 +88,7 @@ public class SpiderController : MonoBehaviour{
 
     bool IsBlocked(Vector3 direction){
         RaycastHit hit;
-        return Physics.Raycast(transform.position, direction, out hit, 7f) && hit.collider.CompareTag("Wall");
+        return Physics.Raycast(transform.position, direction, out hit, 2f) && hit.collider.CompareTag("Wall");
     }
     
     // Change the enemy's movement direction to a random direction
@@ -127,7 +119,6 @@ public class SpiderController : MonoBehaviour{
 
         // Set the new direction of movement
         moveDirection = randomDirection;
-
         // Mover al enemigo en la dirección establecida a la velocidad configurada
         //transform.position += moveDirection * moveSpeed * Time.deltaTime;
 
@@ -211,6 +202,12 @@ public class SpiderController : MonoBehaviour{
         // Calculate the knockback direction
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+
+        if (!isStunned) {
+            Debug.Log("The enemy is stunned ");
+            StartCoroutine(StunEnemy(2.0f));  // Asumamos que el aturdimiento dura 2 segundos
+        }
+
         // Check if the enemy's health has reached zero or below
         if (currentHealth <= 0)
         {
@@ -220,11 +217,25 @@ public class SpiderController : MonoBehaviour{
         }
     }
 
+    private IEnumerator StunEnemy(float duration) {
+        isStunned = true;
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+    }
+
     void Die()
     {
         Debug.Log("Enemy died!");
+        animation.Play("Death");
+        StartCoroutine(DisableAfterAnimation(animation["Death"].length));
+    }
 
-        // disable the gameobject
+    IEnumerator DisableAfterAnimation(float delay)
+    {
+        // Espera durante la duración de la animación de muerte antes de proceder
+        yield return new WaitForSeconds(delay);
+
+        // Desactiva el GameObject después de que la animación haya terminado
         gameObject.SetActive(false);
     }
 

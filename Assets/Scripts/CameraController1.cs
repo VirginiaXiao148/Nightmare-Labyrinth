@@ -20,7 +20,7 @@ public class CameraController1 : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked; // Locks the cursor in the center of the screen
         Cursor.visible = false; // Hides the cursor for a more immersive camera control
-        
+
         // Inicializa la rotación y posición de la cámara
         yaw = transform.eulerAngles.y;
         pitch = transform.eulerAngles.x;
@@ -31,6 +31,11 @@ public class CameraController1 : MonoBehaviour
     // LateUpdate is called after all Update functions have been called
     void LateUpdate()
     {
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
         // Rotate the camera
         yaw += speedH * Input.GetAxis("Mouse X");
         pitch -= speedV * Input.GetAxis("Mouse Y");

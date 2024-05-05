@@ -13,6 +13,7 @@ public class AricController1 : MonoBehaviour
 
     public int maxHealth = 100;
     public int attackDamage = 10;
+    public float attackRange = 1.5f; // Rango de ataque
     int currentHealth;
 
     private MazeGenerator mazeGenerator;
@@ -144,19 +145,26 @@ public class AricController1 : MonoBehaviour
         {
             Debug.Log("Attempt to attack");
             Debug.Log("Mouse button pressed");
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
             animator.SetTrigger("Attack");
-            if (Physics.Raycast(ray, out hit, 5f))
+            StartCoroutine(HandleDelayedAttack());
+        }
+    }
+
+    IEnumerator HandleDelayedAttack()
+    {
+        // Espera un segundo antes de continuar con la lógica del ataque
+        yield return new WaitForSeconds(1f);
+
+        // Realiza el chequeo de colisión para aplicar el daño
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange))
+        {
+            Debug.Log("Raycast hit: " + hit.collider.name);
+            SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
+            if (spiderController != null)
             {
-                Debug.Log("Raycast hit: " + hit.collider.name);
-                SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
-                if (spiderController != null)
-                {
-                    spiderController.TakeDamage(attackDamage);
-                    
-                    Debug.Log("Enemy hit");
-                }
+                spiderController.TakeDamage(attackDamage);
+                Debug.Log("Enemy hit");
             }
         }
     }
