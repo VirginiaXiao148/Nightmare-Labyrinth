@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.301' # replace with your .NET version
+        dotnet-version: '5.0.x' # .NET 5.0 is compatible with C# 9.0
 
     - name: Restore dependencies
       run: dotnet restore
