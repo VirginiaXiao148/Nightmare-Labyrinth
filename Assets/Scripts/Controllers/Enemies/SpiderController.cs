@@ -3,21 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SpiderController : MonoBehaviour{
+public class SpiderController : MonoBehaviour
+{
 
-    public float moveSpeed = 1f; // Speed of enemy movement
+    public float moveSpeed = 0.5f; // Speed of enemy movement
     private Vector3 moveDirection; // Current movement direction of the enemy
 
     private bool isStunned = false;
-
-    float radius = 5f; // Radius within which the enemy can detect the player
 
     private float changeDirectionInterval = 2f; // Time interval to change movement direction
     private float timer; // Timer to control direction change
 
     public float maxHealthSpider = 30;
-    public Image healthBar; // Reference to the health bar image
-    public Text healthText; // Reference to the health text
+    private float currentHealth; // Current health of the enemy
+    public HealthBar healthBar; // Reference to the HealthBar script
 
     public float attackRange = 1.5f;
     public int attackDamage = 5;
@@ -27,11 +26,10 @@ public class SpiderController : MonoBehaviour{
     public string id;
 
     public float fieldOfViewAngle = 90f; // Enemy's field of view angle (in degrees)
-    public float maxSightDistance = 10f; // Maximum distance at which the enemy can detect the player
-
-    private float currentHealth; // Current health of the enemy
+    public float detectionRadius = 10f; // Radius at which the enemy can detect the player
 
     private Transform player; // Reference to the player's transform
+    public LayerMask playerLayer;
 
     private Animation animation; // Reference to the animation component
 
@@ -50,6 +48,8 @@ public class SpiderController : MonoBehaviour{
         id = System.Guid.NewGuid().ToString();
 
         currentHealth = maxHealthSpider; // Initialize current health to maximum health
+        healthBar.SetHealth(currentHealth, maxHealthSpider);
+
         animation = GetComponent<Animation>(); // Get reference to the Animation component attached to this GameObject
 
         player = GameObject.FindGameObjectWithTag("Player").transform; // Find and store a reference to the player's transform
@@ -57,54 +57,53 @@ public class SpiderController : MonoBehaviour{
         // Initially, assign a random movement direction to the enemy
         ChangeDirection();
 
-        Debug.Log("Current health "+currentHealth);
+        Debug.Log("Current health " + currentHealth);
     }
 
-    void Update(){
+    void Update()
+    {
 
-        if (!isStunned) {
+        if (!isStunned)
+        {
             // Todo tu código de movimiento y seguimiento del jugador
             timer += Time.deltaTime;
             Vector3 newPosition = transform.position += moveDirection * moveSpeed * Time.deltaTime;
             rb.MovePosition(newPosition);
-            if (timer >= changeDirectionInterval) {
+            if (timer >= changeDirectionInterval)
+            {
                 ChangeDirection();
                 timer = 0f;
             }
 
-            if (IsPlayerAround()) {
+            if (IsPlayerInSight())
+            {
                 float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown) {
+                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+                {
                     AttackPlayer();
-                } else if (distanceToPlayer > attackRange) {
+                }
+                else if (distanceToPlayer > attackRange)
+                {
                     FollowPlayer();
                 }
             }
         }
 
         Debug.Log(getLife());
-        UpdateHealth();
     }
 
-    string getLife(){
+    string getLife()
+    {
         string txt = "Araña " + id + " y su vida es " + currentHealth;
         return txt;
     }
 
-    void UpdateHealth()
+    bool IsBlocked(Vector3 direction)
     {
-        // Update the health bar
-        healthBar.fillAmount = currentHealth / maxHealthSpider;
-        string txt = "Araña " + id + " y su vida es " + currentHealth.ToString();
-        // Update the health text
-        healthText.text = txt;
+        RaycastHit hit;
+        return Physics.Raycast(transform.position, direction, out hit, 3f) && hit.collider.CompareTag("Wall");
     }
 
-    bool IsBlocked(Vector3 direction){
-        RaycastHit hit;
-        return Physics.Raycast(transform.position, direction, out hit, 2f) && hit.collider.CompareTag("Wall");
-    }
-    
     // Change the enemy's movement direction to a random direction
     void ChangeDirection()
     {
@@ -126,7 +125,8 @@ public class SpiderController : MonoBehaviour{
             float randomZ = Random.Range(-1f, 1f);
             randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
 
-            if (!IsBlocked(randomDirection)){
+            if (!IsBlocked(randomDirection))
+            {
                 foundValidDirection = true;
             }
         }
@@ -140,16 +140,25 @@ public class SpiderController : MonoBehaviour{
         transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
     }
 
-    bool IsPlayerAround()
+
+
+    bool IsPlayerInSight()
     {
-        // Calculate the distance between the player and the enemy
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        RaycastHit hit;
+        Vector3 directionToPlayer = (player.position - transform.position).normalized;
 
-        // Check if the player is within the specified radius
-        return distanceToPlayer <= radius;
+        // Check if the player is within a certain radius of the spider
+        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                Debug.Log("Player seen!");
+                return true;
+            }
+        }
+        // The player is not within the sight range or is obstructed
+        return false;
     }
-
-
 
     void FollowPlayer()
     {
@@ -158,7 +167,7 @@ public class SpiderController : MonoBehaviour{
             // If "Run" animation is not playing, play it
             PlayRunAnimation();
         }
-        
+
         Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
         rb.MovePosition(newPosition);
     }
@@ -168,7 +177,7 @@ public class SpiderController : MonoBehaviour{
     {
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, directionToPlayer, out hit, maxSightDistance))
+        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
         {
             Debug.Log("Hit: " + hit.collider.name);  // Esto te dirá qué objeto está golpeando el raycast
             if (hit.collider.CompareTag("Player"))
@@ -177,7 +186,7 @@ public class SpiderController : MonoBehaviour{
                 // Play the attack animation
                 animation.Play("Attack");
                 // Deal damage to the player (you should call a function in the player's script to handle damage logic)
-                player.GetComponent<AricController1>().TakeDamage(attackDamage);
+                player.GetComponent<AricController>().TakeDamage(attackDamage);
                 // Record the time of the last attack
                 lastAttackTime = Time.time;
             }
@@ -193,13 +202,15 @@ public class SpiderController : MonoBehaviour{
         GetComponent<Animation>().Stop();
         // Decrease the enemy's health by the specified damage amount
         currentHealth -= damage;
+        healthBar.SetHealth(currentHealth, maxHealthSpider);
         Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
         // Knockback the enemy when taking damage
         // Calculate the knockback direction
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
 
-        if (!isStunned) {
+        if (!isStunned)
+        {
             Debug.Log("The enemy is stunned ");
             StartCoroutine(StunEnemy(2.0f));  // Asumamos que el aturdimiento dura 2 segundos
         }
@@ -213,7 +224,8 @@ public class SpiderController : MonoBehaviour{
         }
     }
 
-    private IEnumerator StunEnemy(float duration) {
+    private IEnumerator StunEnemy(float duration)
+    {
         isStunned = true;
         yield return new WaitForSeconds(duration);
         isStunned = false;
