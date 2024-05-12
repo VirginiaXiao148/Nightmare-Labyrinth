@@ -11,6 +11,9 @@ public class MazeGenerator : MonoBehaviour{
     public int startX, startY;  // the starting position
 
     public GameObject wallPrefab;
+
+    public Texture[] wallTextures;  // The textures for the walls
+
     public GameObject spider;
     public int numberOfSpiders = 10;
 
@@ -40,23 +43,17 @@ public class MazeGenerator : MonoBehaviour{
 
     }
 
-    private List<Direction> directions = new List<Direction> {
-        Direction.Up, Direction.Down, Direction.Left, Direction.Right
-    };
+    private static Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 
-    private List<Direction> GetRandomDirection()
+    private void ShuffleDirections()
     {
-        List<Direction> copyDirections = new List<Direction>(directions);
-        List<Direction> randomDirections = new List<Direction>();
-
-        while (copyDirections.Count > 0)
+        for (int i = 0; i < directions.Length; i++)
         {
-            int randomIndex = Random.Range(0, copyDirections.Count);
-            randomDirections.Add(copyDirections[randomIndex]);
-            copyDirections.RemoveAt(randomIndex);
+            int rand = Random.Range(i, directions.Length);
+            Direction temp = directions[i];
+            directions[i] = directions[rand];
+            directions[rand] = temp;
         }
-
-        return randomDirections;
     }
 
     bool IsCellValid(int x, int y)
@@ -71,40 +68,35 @@ public class MazeGenerator : MonoBehaviour{
 
     Vector2Int CheckNeighbour()
     {
-        // Get random directions
-        List<Direction> rndDir = GetRandomDirection();
+        ShuffleDirections();
 
-        foreach (Direction dir in rndDir)
+        foreach (Direction dir in directions)
         {
-            // Set the neighbour
-            Vector2Int neighbour = currentCell;
+            Vector2Int neighbour = currentCell + DirectionToVector(dir);
 
-            switch (dir)
-            {
-                case Direction.Up:
-                    neighbour.y++;
-                    break;
-                case Direction.Down:
-                    neighbour.y--;
-                    break;
-                case Direction.Left:
-                    neighbour.x--;
-                    break;
-                case Direction.Right:
-                    neighbour.x++;
-                    break;
-            }
-
-            // Check the cell is valid
             if (IsCellValid(neighbour.x, neighbour.y))
             {
                 return neighbour;
             }
         }
 
-        // Return the current cell if neighbour is not valid
-        return currentCell;
+        return currentCell;  // Considerar ajustar esta parte para mejorar la lógica de retroceso
+    }
 
+    Vector2Int DirectionToVector(Direction dir)
+    {
+        switch (dir)
+        {
+            case Direction.Up:
+                return new Vector2Int(0, 1);
+            case Direction.Down:
+                return new Vector2Int(0, -1);
+            case Direction.Left:
+                return new Vector2Int(-1, 0);
+            case Direction.Right:
+                return new Vector2Int(1, 0);
+        }
+        return Vector2Int.zero;
     }
 
     void BreakWall(Vector2Int currentCell, Vector2Int nextCell){
@@ -157,20 +149,20 @@ public class MazeGenerator : MonoBehaviour{
 
             Vector2Int nextCell = CheckNeighbour();
 
-            if (nextCell == currentCell)
+            if (nextCell != currentCell)
             {
-
-                // Backtrack if dead end is reached
-                currentCell = path.Pop();
-            }
-            else
-            {
-
                 BreakWall(currentCell, nextCell);
                 maze[currentCell.x, currentCell.y].visited = true;
+
+                if (!maze[nextCell.x, nextCell.y].visited)
+                {
+                    GameObject wall = Instantiate(wallPrefab, new Vector3(nextCell.x, 0, nextCell.y), Quaternion.identity);
+                    Renderer wallRenderer = wall.GetComponent<Renderer>();
+                    wallRenderer.material.mainTexture = wallTextures[Random.Range(0, wallTextures.Length)];
+                }
+
                 currentCell = nextCell;
                 path.Push(currentCell);
-
             }
         }
     }
