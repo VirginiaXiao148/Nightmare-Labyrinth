@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1025946647561613846}
   m_Layer: 0
   m_Name: MazeCell
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f371b6d7ab81e06469d544628733e5d0, type: 2}
+  - {fileID: 2100000, guid: dd5c450a195c41f4c8cf8a51a7d0ef6e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
