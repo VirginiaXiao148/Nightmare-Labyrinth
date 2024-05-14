@@ -132,9 +132,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 224379651}
-  - component: {fileID: 224379653}
-  - component: {fileID: 224379652}
   - component: {fileID: 224379654}
+  - component: {fileID: 224379655}
   m_Layer: 0
   m_Name: Maze
   m_TagString: Untagged
@@ -157,43 +156,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &224379652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 224379650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b72b883c383540648969740093013be5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mazeGenerator: {fileID: 224379653}
-  mazeCellPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
-  cellSize: 1
---- !u!114 &224379653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 224379650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 143e07ddff7f7df4d93dd41ca0acfea5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mazeWidth: 15
-  mazeHeight: 15
-  startX: 0
-  startY: 0
-  wallPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
-  wallTextures:
-  - {fileID: 2800000, guid: b083c40591d536b4cb7062c13a8aa631, type: 3}
-  - {fileID: 2800000, guid: bc65c7f17422ace41bc93ea6593a0512, type: 3}
-  spider: {fileID: 6440129996965406069, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
-  numberOfSpiders: 3
 --- !u!82 &224379654
 AudioSource:
   m_ObjectHideFlags: 0
@@ -290,6 +252,25 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &224379655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224379650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3acd3b96f37ae644e962426b65aef7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mazeWidth: 15
+  mazeHeight: 15
+  mazeCellPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
+  beaceletPrefab: {fileID: 6389838491836030581, guid: f7f81c2bce8623c44a9cd355f70de49e, type: 3}
+  spider: {fileID: 1470893535}
+  numberOfSpiders: 3
+  cellSize: 1
 --- !u!1001 &296641174
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -298,14 +279,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -7660492969007768137, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -7660492969007768137, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
-      propertyPath: playerLayer.m_Bits
-      value: 8
-      objectReference: {fileID: 0}
     - target: {fileID: 6440129996965181589, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.00473
@@ -814,6 +787,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1470893535 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6440129996965406069, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
+  m_PrefabInstance: {fileID: 296641174}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1654473293
 GameObject:
   m_ObjectHideFlags: 0
