@@ -9,20 +9,22 @@ public class MazeGeneratorOptimized1 : MonoBehaviour
 
     [Range(5, 100)]
     public int mazeWidth = 10, mazeHeight = 10;  // the dimensions of the maze
-
-    public GameObject mazeCellPrefab;
+    
     public GameObject beaceletPrefab;
     public GameObject spider;
     public int numberOfSpiders = 3;
 
     public float cellSize = 1f;
 
+    public MazeCellOptimized mazeCellPrefab;
     MazeCellOptimized[,] maze;
 
     void Start()
     {
         InitializeMaze();
         GenerateMaze(0, 0); // Start generation at the top-left corner of the maze
+        PlaceExit();        // Place the maze exit
+        PlaceEnemies();     // Place enemies within the maze
     }
 
     void InitializeMaze()
@@ -33,12 +35,13 @@ public class MazeGeneratorOptimized1 : MonoBehaviour
         {
             for (int y = 0; y < mazeHeight; y++)
             {
-                // Instanciar el prefab en la posición correcta
-                GameObject newCell = Instantiate(mazeCellPrefab, new Vector3((float)x * cellSize, 0f, (float)y * cellSize), Quaternion.identity, transform);
-                MazeCellObjects mazeCell = newCell.GetComponent<MazeCellObjects>();
-                
-                // Set the walls active
-                mazeCell.Init(true, true, true, true);
+                // Instantiate the prefab at the correct position
+                MazeCellOptimized cell = Instantiate(mazeCellPrefab, new Vector3(x, 0, y), Quaternion.identity);
+                maze[x, y] = cell;
+
+                // Initialize all walls as active
+                cell.Init(true, true, true, true);
+
             }
         }
     }

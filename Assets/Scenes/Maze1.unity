@@ -266,11 +266,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mazeWidth: 15
   mazeHeight: 15
-  mazeCellPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
   beaceletPrefab: {fileID: 6389838491836030581, guid: f7f81c2bce8623c44a9cd355f70de49e, type: 3}
   spider: {fileID: 1470893535}
   numberOfSpiders: 3
   cellSize: 1
+  mazeCellPrefab: {fileID: 5761931922157370568, guid: 447233026b8376843a7ab39f413d1716, type: 3}
 --- !u!1001 &296641174
 PrefabInstance:
   m_ObjectHideFlags: 0

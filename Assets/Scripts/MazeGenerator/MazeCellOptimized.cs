@@ -15,13 +15,14 @@ public class MazeCellOptimized : MonoBehaviour
     [SerializeField] GameObject bottomWallOptimized;
     [SerializeField] GameObject leftWallOptimized;
 
-    public void Init(bool top, bool right, bool bottom, bool left)
+    public void Init( bool top, bool right, bool bottom, bool left)
     {
         topWallOptimized.SetActive(top);
         rightWallOptimized.SetActive(right);
         bottomWallOptimized.SetActive(bottom);
         leftWallOptimized.SetActive(left);
     }
+
 
     public Vector2Int position
     {
@@ -30,10 +31,12 @@ public class MazeCellOptimized : MonoBehaviour
             return new Vector2Int(x, y);
         }
     }
-    public MazeCellOptimized(int x, int y)
+
+    // Unity's Awake method for initialization
+    void Awake()
     {
-        this.x = x;
-        this.y = y;
+        visited = false;
+        topWall = leftWall = true;
         visited = false;
         topWall = leftWall = true;
     }
