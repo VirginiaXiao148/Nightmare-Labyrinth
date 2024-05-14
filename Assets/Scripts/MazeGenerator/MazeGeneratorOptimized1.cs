@@ -36,12 +36,14 @@ public class MazeGeneratorOptimized1 : MonoBehaviour
             for (int y = 0; y < mazeHeight; y++)
             {
                 // Instantiate the prefab at the correct position
-                MazeCellOptimized cell = Instantiate(mazeCellPrefab, new Vector3(x, 0, y), Quaternion.identity);
-                maze[x, y] = cell;
+                GameObject newCell = Instantiate(mazeCellPrefab, new Vector3((float)x * cellSize, 0f, (float)y * cellSize), Quaternion.identity, transform);
+                MazeCellOptimized mazeCell = newCell.GetComponent<MazeCellOptimized>();
 
-                // Initialize all walls as active
-                cell.Init(true, true, true, true);
+                // Initialize the cell with its position and all walls active
+                mazeCell.Init(true, true, true, true);
 
+                // Store the maze cell in the array for later use
+                maze[x, y] = mazeCell;
             }
         }
     }
