@@ -154,7 +154,7 @@ public class MazeGeneratorOptimized1 : MonoBehaviour
             attempts++;
             if (attempts > 5) // Avoid infinite loop
             {
-                Debug.LogWarning("Unable to find unique position for enemy after 100 attempts.");
+                Debug.LogWarning("Unable to find unique position for enemy after 5 attempts.");
                 break;
             }
         } while (occupiedPositions.Contains(position));
