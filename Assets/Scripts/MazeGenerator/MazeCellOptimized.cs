@@ -7,9 +7,6 @@ public class MazeCellOptimized : MonoBehaviour
     public bool visited;
     public int x, y;
 
-    public bool topWall;
-    public bool leftWall;
-
     [SerializeField] GameObject topWallOptimized;
     [SerializeField] GameObject rightWallOptimized;
     [SerializeField] GameObject bottomWallOptimized;
@@ -36,9 +33,7 @@ public class MazeCellOptimized : MonoBehaviour
     void Awake()
     {
         visited = false;
-        topWall = leftWall = true;
-        visited = false;
-        topWall = leftWall = true;
+        Init(true, true, true, true); // Initialize all walls as active
     }
 
     public void RemoveWall(MazeCellOptimized neighbor)

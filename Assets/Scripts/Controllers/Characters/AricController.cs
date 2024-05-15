@@ -18,7 +18,7 @@ public class AricController : MonoBehaviour
     public float attackRange = 1.5f; // Rango de ataque
     int currentHealth;
 
-    private MazeGenerator mazeGenerator;
+    private MazeGeneratorOptimized1 mazeGenerator;
     // Character controller component
     private CharacterController controller;
 
@@ -57,7 +57,7 @@ public class AricController : MonoBehaviour
         // We set the health of the character
         animator.SetInteger("Health", currentHealth);
 
-        mazeGenerator = GameObject.FindObjectOfType<MazeGenerator>();
+        mazeGenerator = GameObject.FindObjectOfType<MazeGeneratorOptimized1>();
 
         if (mazeGenerator != null)
         {
