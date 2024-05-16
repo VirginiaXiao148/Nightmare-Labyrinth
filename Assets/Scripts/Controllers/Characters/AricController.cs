@@ -14,7 +14,8 @@ public class AricController : MonoBehaviour
     public float attackRange = 1.5f;
     private int currentHealth;
 
-    private MazeGeneratorOptimized1 mazeGenerator;
+    //private MazeGeneratorOptimized1 mazeGenerator;
+    private MazeGenerator mazeGenerator;
     private CharacterController controller;
 
     private Vector3 playerVelocity;
@@ -36,7 +37,7 @@ public class AricController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         animator.SetInteger("Health", currentHealth);
 
-        mazeGenerator = GameObject.FindObjectOfType<MazeGeneratorOptimized1>();
+        mazeGenerator = GameObject.FindObjectOfType<MazeGenerator>();
 
         if (mazeGenerator != null)
         {
@@ -97,7 +98,7 @@ public class AricController : MonoBehaviour
 
     private void HandleJumping()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Jump Button Pressed");
             if (groundedPlayer)

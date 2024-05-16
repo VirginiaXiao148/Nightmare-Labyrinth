@@ -135,6 +135,8 @@ GameObject:
   - component: {fileID: 224379654}
   - component: {fileID: 224379655}
   - component: {fileID: 224379656}
+  - component: {fileID: 224379658}
+  - component: {fileID: 224379657}
   m_Layer: 0
   m_Name: Maze
   m_TagString: Untagged
@@ -260,7 +262,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 224379650}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3acd3b96f37ae644e962426b65aef7d5, type: 3}
   m_Name: 
@@ -286,6 +288,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ca4c0da30caf3c4896a19a2b59e82e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &224379657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224379650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b72b883c383540648969740093013be5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mazeGenerator: {fileID: 224379658}
+  mazeCellPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
+  cellSize: 1
+--- !u!114 &224379658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224379650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 143e07ddff7f7df4d93dd41ca0acfea5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mazeWidth: 15
+  mazeHeight: 15
+  startX: 0
+  startY: 0
+  wallPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
+  braceletPrefab: {fileID: 6389838491836030581, guid: f7f81c2bce8623c44a9cd355f70de49e, type: 3}
+  spider: {fileID: 6440129996965406069, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
+  numberOfSpiders: 3
 --- !u!1 &338243368
 GameObject:
   m_ObjectHideFlags: 0

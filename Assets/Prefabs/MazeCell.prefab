@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 910212163775569747}
   - component: {fileID: 1590875144805016271}
   - component: {fileID: 2875827417173319197}
-  - component: {fileID: 5761931922157370568}
+  - component: {fileID: 6763550330110535838}
   m_Layer: 0
   m_Name: MazeCell
   m_TagString: Ground
@@ -133,7 +133,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5761931922157370568
+--- !u!114 &6763550330110535838
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -142,18 +142,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 317807124206353508}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42d3fcdc5b11c8b459d102d6800f0341, type: 3}
+  m_Script: {fileID: 11500000, guid: 51724db6dcc1c1549a2bb36397e9f67a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visited: 0
-  x: 0
-  y: 0
-  topWall: 0
-  leftWall: 0
-  topWallOptimized: {fileID: 8210120730579522468}
-  rightWallOptimized: {fileID: 4559451869153895325}
-  bottomWallOptimized: {fileID: 1769445581481047046}
-  leftWallOptimized: {fileID: 6184048240146098305}
+  topWall: {fileID: 8210120730579522468}
+  rightWall: {fileID: 4559451869153895325}
+  bottomWall: {fileID: 1769445581481047046}
+  leftWall: {fileID: 6184048240146098305}
 --- !u!1 &1769445581481047046
 GameObject:
   m_ObjectHideFlags: 0
