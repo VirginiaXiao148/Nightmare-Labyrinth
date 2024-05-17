@@ -133,7 +133,7 @@ public class AricController : MonoBehaviour
 
     private IEnumerator HandleDelayedAttack()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         audioSource.Play();
 
         RaycastHit hit;

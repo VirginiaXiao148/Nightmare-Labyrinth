@@ -13,6 +13,7 @@ public class MazeGenerator : MonoBehaviour
 
     public GameObject wallPrefab;
     public GameObject spider;
+    public GameObject braceletPrefab;
     public int numberOfSpiders = 10;
 
     MazeCell[,] maze;
@@ -35,7 +36,7 @@ public class MazeGenerator : MonoBehaviour
         }
 
         CarvePath(startX, startY);
-        //GenerateMaze(startX, startY);
+        PlaceExit();
         PlaceEnemies();
 
         return maze;
@@ -177,6 +178,17 @@ public class MazeGenerator : MonoBehaviour
         // Devuelve la posición de inicio del laberinto
         return new Vector2Int(startX, startY);
 
+    }
+
+    void PlaceExit()
+    {
+        float cellSize = 1f;
+        
+        int exitX = mazeWidth - 1;
+        int exitY = mazeHeight - 1;
+
+        Vector3 exitPosition = new Vector3(exitX * cellSize, 0f, exitY * cellSize);
+        Instantiate(braceletPrefab, exitPosition, Quaternion.identity);
     }
 
     public void PlaceEnemies()
