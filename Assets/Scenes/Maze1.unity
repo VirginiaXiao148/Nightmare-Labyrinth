@@ -320,7 +320,6 @@ MonoBehaviour:
   startX: 0
   startY: 0
   wallPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
-  braceletPrefab: {fileID: 6389838491836030581, guid: f7f81c2bce8623c44a9cd355f70de49e, type: 3}
   spider: {fileID: 6440129996965406069, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
   numberOfSpiders: 3
 --- !u!1 &338243368
@@ -584,7 +583,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 500, y: 245.9}
+  m_AnchoredPosition: {x: -608, y: 201.8}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &820866726

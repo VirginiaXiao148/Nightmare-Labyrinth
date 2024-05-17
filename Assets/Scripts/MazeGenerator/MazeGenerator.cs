@@ -222,66 +222,6 @@ public class MazeGenerator : MonoBehaviour
 
     }
 
-
-
-    // Possible optimiazations:
-
-    void GenerateMaze(int startX, int startY)
-    {
-        Stack<Vector2Int> stack = new Stack<Vector2Int>();
-        Vector2Int start = new Vector2Int(startX, startY);
-        maze[start.x, start.y].visited = true;
-        stack.Push(start);
-
-        while (stack.Count > 0)
-        {
-            Vector2Int current = stack.Peek();
-            List<Vector2Int> neighbors = GetUnvisitedNeighbors(current);
-
-            if (neighbors.Count == 0)
-            {
-                // No unvisited neighbors, backtrack
-                stack.Pop();
-            }
-            else
-            {
-                // Visit a random unvisited neighbor
-                Vector2Int neighbor = neighbors[Random.Range(0, neighbors.Count)];
-                // Break the wall between current and neighbor
-                BreakWall(current, neighbor);
-                Debug.Log($"Removing wall between ({current.x}, {current.y}) and ({neighbor.x}, {neighbor.y})");
-
-                // Mark neighbor as visited
-                maze[neighbor.x, neighbor.y].visited = true;
-                stack.Push(neighbor);
-            }
-        }
-
-        Debug.Log("Maze generation complete.");
-    }
-
-    List<Vector2Int> GetUnvisitedNeighbors(Vector2Int cell)
-    {
-        List<Vector2Int> neighbors = new List<Vector2Int>();
-
-        Vector2Int[] possibleNeighbors = {
-            new Vector2Int(cell.x, cell.y + 1), // North
-            new Vector2Int(cell.x + 1, cell.y), // East
-            new Vector2Int(cell.x, cell.y - 1), // South
-            new Vector2Int(cell.x - 1, cell.y)  // West
-        };
-
-        foreach (var n in possibleNeighbors)
-        {
-            if (n.x >= 0 && n.x < mazeWidth && n.y >= 0 && n.y < mazeHeight && !maze[n.x, n.y].visited)
-            {
-                neighbors.Add(n);
-            }
-        }
-
-        return neighbors;
-    }
-
 }
 
 public enum Direction
