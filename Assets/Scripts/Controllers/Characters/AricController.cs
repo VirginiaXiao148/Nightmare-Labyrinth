@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class AricController : MonoBehaviour
@@ -13,6 +14,9 @@ public class AricController : MonoBehaviour
     public int attackDamage = 10;
     public float attackRange = 1.5f;
     private int currentHealth;
+
+    public float mentalHealth = 100;
+    private float currentMentalHealth;
 
     //private MazeGeneratorOptimized1 mazeGenerator;
     private MazeGenerator mazeGenerator;
@@ -33,6 +37,8 @@ public class AricController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
 
         currentHealth = maxHealth;
+        currentMentalHealth = mentalHealth;
+
         animator = gameObject.GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         animator.SetInteger("Health", currentHealth);
@@ -162,6 +168,7 @@ public class AricController : MonoBehaviour
         animator.SetBool("DamageTaken", true);
         if (currentHealth <= 0)
         {
+            // Game Over
             Die();
         }
         StartCoroutine(ResetTakeDamageAnimation());
@@ -169,8 +176,19 @@ public class AricController : MonoBehaviour
 
     private IEnumerator ResetTakeDamageAnimation()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         animator.SetBool("DamageTaken", false);
+    }
+
+    public void TakeMentalDamage(float mentalDamage)
+    {
+        currentMentalHealth -= mentalDamage;
+        animator.SetBool("DamageTaken", true);
+        if (currentMentalHealth <= 0)
+        {
+            // Game Over
+            Die();
+        }
     }
 
     private void Die()
@@ -178,5 +196,12 @@ public class AricController : MonoBehaviour
         animator.SetBool("Death", true);
         Debug.Log("Player died!");
         gameObject.SetActive(false);
+        StartCoroutine(LoadEndSceneAfterDelay("EndScene", 2.0f));
+    }
+
+    IEnumerator LoadEndSceneAfterDelay(string sceneName, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene(sceneName);
     }
 }
