@@ -1,40 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Shadow : MonoBehaviour
 {
     public Transform player;
-    public Light mainLight; // La fuente de luz principal del escenario
+    public Light mainLight;
     public float followSpeed = 2.0f;
-    public float attackDelay = 5.0f; // Tiempo en segundos antes de que la sombra ataque
-    private bool isInShadow = false;
-    private float shadowTimer = 0.0f;
+    public float attackDelay = 5.0f;
 
+    private float shadowTimer = 0.0f;
     public float attackDamage = 5;
+    public float shadowDistance = 2.0f;
 
     private MeshRenderer shadowRenderer;
+    private Rigidbody rb;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        shadowRenderer = GetComponent<MeshRenderer>(); 
-        shadowRenderer.enabled = false; 
+        shadowRenderer = GetComponent<MeshRenderer>();
+        shadowRenderer.enabled = false;
     }
 
     void Update()
     {
         if (IsPlayerInShadow())
         {
-            FollowPlayer();
+            PlaceShadowBehindPlayer();
             shadowRenderer.enabled = true;
 
             shadowTimer += Time.deltaTime;
 
             if (shadowTimer >= attackDelay)
             {
-                //AttackPlayer();
+                AttackPlayer();
                 shadowTimer = 0.0f;
             }
         }
@@ -56,18 +61,20 @@ public class Shadow : MonoBehaviour
             // Si el raycast golpea una pared antes de alcanzar la luz, el jugador está en la sombra
             if (hit.collider.CompareTag("Wall"))
             {
-                isInShadow = true;
                 return true;
             }
         }
 
-        isInShadow = false;
-        return isInShadow;
+        return false;
     }
 
-    void FollowPlayer()
+    void PlaceShadowBehindPlayer()
     {
-        Vector3 targetPosition = player.position;
+        // Calcular la posición detrás del jugador
+        Vector3 directionBehindPlayer = -player.forward;
+        Vector3 targetPosition = player.position + directionBehindPlayer * shadowDistance;
+
+        // Mover la sombra suavemente a la posición calculada
         transform.position = Vector3.Lerp(transform.position, targetPosition, followSpeed * Time.deltaTime);
     }
 
@@ -81,6 +88,14 @@ public class Shadow : MonoBehaviour
         // Rotar la sombra hacia el jugador
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * followSpeed);
 
-        player.GetComponent<AricController>().TakeMentalDamage(attackDamage);
+        // Realizar el ataque
+        Debug.Log("Sombra atacando al jugador");
+
+        // Implementar lógica de ataque, por ejemplo, aplicar daño al jugador
+        AricController playerController = player.GetComponent<AricController>();
+        if (playerController != null)
+        {
+            playerController.TakeMentalDamage(attackDamage);
+        }
     }
 }
