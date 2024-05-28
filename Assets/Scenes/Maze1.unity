@@ -299,7 +299,7 @@ MonoBehaviour:
   startY: 0
   wallPrefab: {fileID: 317807124206353508, guid: 447233026b8376843a7ab39f413d1716, type: 3}
   spider: {fileID: 6440129996965406069, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
-  braceletPrefab: {fileID: 6389838491836030581, guid: f7f81c2bce8623c44a9cd355f70de49e, type: 3}
+  PortalPrefab: {fileID: 7494077095689113452, guid: 04f07d17358228d4d83d4e539464d6ce, type: 3}
   numberOfSpiders: 3
 --- !u!1 &338243368
 GameObject:
