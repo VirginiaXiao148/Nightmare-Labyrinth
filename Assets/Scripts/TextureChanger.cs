@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class TextureChanger : MonoBehaviour
 {
-    public Texture newTexture; // Asigna esta variable en el inspector con la nueva textura
-
-    //public Texture[] wallTextures;  // The textures for the walls
+    public Texture[] wallTextures;  // The textures for the walls
 
     // Start is called before the first frame update
     void Start()
@@ -14,9 +12,8 @@ public class TextureChanger : MonoBehaviour
         // Obtén el Renderer del prefab
         Renderer renderer = GetComponent<Renderer>();
 
-        // Cambia la textura
-        renderer.material.mainTexture = newTexture;
-        //renderer.material.mainTexture = wallTextures[Random.Range(0, wallTextures.Length)];
+        // Change the texture
+        renderer.material.mainTexture = wallTextures[Random.Range(0, wallTextures.Length)];
     }
 
     // Update is called once per frame

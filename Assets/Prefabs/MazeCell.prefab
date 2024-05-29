@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 6044096446890049548}
   - component: {fileID: 7949388515287922443}
   - component: {fileID: 9220960472281584675}
+  - component: {fileID: 4565603805154263322}
   m_Layer: 0
   m_Name: BottomWall
   m_TagString: Wall
@@ -254,6 +255,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4565603805154263322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1769445581481047046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65610898448ffd343bac1315eb5361f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallTextures:
+  - {fileID: 2800000, guid: 1c1c2e0a8443f964f969beb26df2db2c, type: 3}
+  - {fileID: 2800000, guid: 35ca2a169309a5648b4f73b4cee093cc, type: 3}
+  - {fileID: 2800000, guid: 6933b8ed65339784c831f6449599d00c, type: 3}
+  - {fileID: 2800000, guid: 1d2fe280e8f80b24a8aab2d1100f5b74, type: 3}
 --- !u!1 &4559451869153895325
 GameObject:
   m_ObjectHideFlags: 0
@@ -266,6 +284,7 @@ GameObject:
   - component: {fileID: 7614166919678842523}
   - component: {fileID: 2188269139199234255}
   - component: {fileID: 1467233253159730368}
+  - component: {fileID: 291817733666665963}
   m_Layer: 0
   m_Name: RightWall
   m_TagString: Wall
@@ -359,6 +378,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &291817733666665963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559451869153895325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65610898448ffd343bac1315eb5361f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallTextures:
+  - {fileID: 2800000, guid: 1c1c2e0a8443f964f969beb26df2db2c, type: 3}
+  - {fileID: 2800000, guid: 35ca2a169309a5648b4f73b4cee093cc, type: 3}
+  - {fileID: 2800000, guid: 6933b8ed65339784c831f6449599d00c, type: 3}
+  - {fileID: 2800000, guid: 1d2fe280e8f80b24a8aab2d1100f5b74, type: 3}
 --- !u!1 &6184048240146098305
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,6 +407,7 @@ GameObject:
   - component: {fileID: 6928205614359699305}
   - component: {fileID: 5427402501066022106}
   - component: {fileID: 9116291955662665237}
+  - component: {fileID: 4953682602200768605}
   m_Layer: 0
   m_Name: LeftWall
   m_TagString: Wall
@@ -464,6 +501,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4953682602200768605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6184048240146098305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65610898448ffd343bac1315eb5361f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallTextures:
+  - {fileID: 2800000, guid: 1c1c2e0a8443f964f969beb26df2db2c, type: 3}
+  - {fileID: 2800000, guid: 35ca2a169309a5648b4f73b4cee093cc, type: 3}
+  - {fileID: 2800000, guid: 6933b8ed65339784c831f6449599d00c, type: 3}
+  - {fileID: 2800000, guid: 1d2fe280e8f80b24a8aab2d1100f5b74, type: 3}
 --- !u!1 &8210120730579522468
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +530,7 @@ GameObject:
   - component: {fileID: 7757266481406994528}
   - component: {fileID: 1590448652257283832}
   - component: {fileID: 3961869776411529413}
+  - component: {fileID: 4402333762774073931}
   m_Layer: 0
   m_Name: TopWall
   m_TagString: Wall
@@ -569,3 +624,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4402333762774073931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8210120730579522468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65610898448ffd343bac1315eb5361f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallTextures:
+  - {fileID: 2800000, guid: 1c1c2e0a8443f964f969beb26df2db2c, type: 3}
+  - {fileID: 2800000, guid: 35ca2a169309a5648b4f73b4cee093cc, type: 3}
+  - {fileID: 2800000, guid: 6933b8ed65339784c831f6449599d00c, type: 3}
+  - {fileID: 2800000, guid: 1d2fe280e8f80b24a8aab2d1100f5b74, type: 3}
