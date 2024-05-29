@@ -24,7 +24,7 @@ public class AricController : MonoBehaviour
 
     private Vector3 playerVelocity;
     private bool groundedPlayer;
-    private float playerSpeed = 3f;
+    private float playerSpeed = 0.5f;
     [SerializeField] private float jumpHeight = 0.5f;
     [SerializeField] private float gravityValue = -9.81f;
 
