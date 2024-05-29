@@ -73,6 +73,52 @@ public class AricController : MonoBehaviour
     private void HandleMovement()
     {
         groundedPlayer = controller.isGrounded;
+        if (groundedPlayer && playerVelocity.y < 0)
+        {
+            playerVelocity.y = 0f;
+        }
+
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        Vector3 forward = mainCamera.transform.forward;
+        Vector3 right = mainCamera.transform.right;
+        forward.y = 0; // Normalize forward vector to the horizontal plane
+        right.y = 0; // Normalize right vector to the horizontal plane
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 moveDirection;
+
+        // Special handling for when the S key is pressed
+        if (Input.GetKey(KeyCode.S))
+        {
+            // Rotate to face backward and move in that direction
+            moveDirection = -forward; // Set move direction directly backwards relative to the camera
+            Quaternion backwardRotation = Quaternion.LookRotation(-forward, Vector3.up); // Create a rotation looking directly backwards
+            transform.rotation = Quaternion.Slerp(transform.rotation, backwardRotation, rotationSpeed * Time.deltaTime); // Smoothly interpolate to the backward rotation
+        }
+        else
+        {
+            // Handle normal movement in all other directions
+            moveDirection = forward * vertical + right * horizontal;
+            if (moveDirection != Vector3.zero)
+            {
+                Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+                transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+            }
+        }
+
+        controller.Move(moveDirection * playerSpeed * Time.deltaTime);
+        playerVelocity.y += gravityValue * Time.deltaTime;
+        controller.Move(playerVelocity * Time.deltaTime);
+    }
+
+    /**
+     * 
+     * private void HandleMovement()
+    {
+        groundedPlayer = controller.isGrounded;
 
         if (groundedPlayer && playerVelocity.y < 0)
         {
@@ -101,6 +147,8 @@ public class AricController : MonoBehaviour
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
     }
+     * 
+     * **/
 
     private void HandleJumping()
     {
