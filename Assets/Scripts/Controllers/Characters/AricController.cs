@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -18,7 +17,6 @@ public class AricController : MonoBehaviour
     public float mentalHealth = 100;
     private float currentMentalHealth;
 
-    //private MazeGeneratorOptimized1 mazeGenerator;
     private MazeGenerator mazeGenerator;
     private CharacterController controller;
 
@@ -56,18 +54,11 @@ public class AricController : MonoBehaviour
 
     private void Update()
     {
-        try
-        {
-            HandleMovement();
-            HandleJumping();
-            HandleAnimations();
-            HandleAttack();
-            UpdateHealth();
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError("Error in Update method: " + ex.Message);
-        }
+        HandleMovement();
+        HandleJumping();
+        HandleAnimations();
+        HandleAttack();
+        UpdateHealthUI();
     }
 
     private void HandleMovement()
@@ -78,35 +69,11 @@ public class AricController : MonoBehaviour
             playerVelocity.y = 0f;
         }
 
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        Vector3 forward = mainCamera.transform.forward;
-        Vector3 right = mainCamera.transform.right;
-        forward.y = 0; // Normalize forward vector to the horizontal plane
-        right.y = 0; // Normalize right vector to the horizontal plane
-        forward.Normalize();
-        right.Normalize();
-
-        Vector3 moveDirection;
-
-        // Special handling for when the S key is pressed
-        if (Input.GetKey(KeyCode.S))
+        Vector3 moveDirection = GetInputDirection();
+        if (moveDirection != Vector3.zero)
         {
-            // Rotate to face backward and move in that direction
-            moveDirection = -forward; // Set move direction directly backwards relative to the camera
-            Quaternion backwardRotation = Quaternion.LookRotation(-forward, Vector3.up); // Create a rotation looking directly backwards
-            transform.rotation = Quaternion.Slerp(transform.rotation, backwardRotation, rotationSpeed * Time.deltaTime); // Smoothly interpolate to the backward rotation
-        }
-        else
-        {
-            // Handle normal movement in all other directions
-            moveDirection = forward * vertical + right * horizontal;
-            if (moveDirection != Vector3.zero)
-            {
-                Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-                transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
-            }
+            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
 
         controller.Move(moveDirection * playerSpeed * Time.deltaTime);
@@ -114,17 +81,8 @@ public class AricController : MonoBehaviour
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
-    /**
-     * 
-     * private void HandleMovement()
+    private Vector3 GetInputDirection()
     {
-        groundedPlayer = controller.isGrounded;
-
-        if (groundedPlayer && playerVelocity.y < 0)
-        {
-            playerVelocity.y = 0f;
-        }
-
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -135,35 +93,22 @@ public class AricController : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
+        // Combining both horizontal and vertical inputs to get the direction
         Vector3 moveDirection = forward * vertical + right * horizontal;
 
-        if (moveDirection != Vector3.zero)
+        if (Input.GetKey(KeyCode.S))
         {
-            controller.Move(moveDirection * playerSpeed * Time.deltaTime);
-            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+            moveDirection = -forward;
         }
 
-        playerVelocity.y += gravityValue * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
+        return moveDirection;
     }
-     * 
-     * **/
 
     private void HandleJumping()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && groundedPlayer)
         {
-            Debug.Log("Jump Button Pressed");
-            if (groundedPlayer)
-            {
-                Debug.Log("Player is Grounded - Executing Jump");
-                playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
-            }
-            else
-            {
-                Debug.Log("Player is not Grounded - Jump not Executed");
-            }
+            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
         }
     }
 
@@ -179,7 +124,6 @@ public class AricController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Attempt to attack");
             animator.SetTrigger("Attack");
             StartCoroutine(HandleDelayedAttack());
         }
@@ -190,20 +134,17 @@ public class AricController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         audioSource.Play();
 
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange))
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, attackRange))
         {
-            Debug.Log("Raycast hit: " + hit.collider.name);
             SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
             if (spiderController != null)
             {
                 spiderController.TakeDamage(attackDamage);
-                Debug.Log("Enemy hit");
             }
         }
     }
 
-    private void UpdateHealth()
+    private void UpdateHealthUI()
     {
         healthBar.fillAmount = (float)currentHealth / maxHealth;
         healthText.text = currentHealth.ToString();
@@ -211,12 +152,10 @@ public class AricController : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
-        Debug.Log("The character has taken damage: " + damageAmount);
         currentHealth -= damageAmount;
         animator.SetBool("DamageTaken", true);
         if (currentHealth <= 0)
         {
-            // Game Over
             Die();
         }
         StartCoroutine(ResetTakeDamageAnimation());
@@ -234,7 +173,6 @@ public class AricController : MonoBehaviour
         animator.SetBool("DamageTaken", true);
         if (currentMentalHealth <= 0)
         {
-            // Game Over
             Die();
         }
     }
@@ -242,12 +180,11 @@ public class AricController : MonoBehaviour
     private void Die()
     {
         animator.SetBool("Death", true);
-        Debug.Log("Player died!");
         gameObject.SetActive(false);
         StartCoroutine(LoadEndSceneAfterDelay("EndScene", 2.0f));
     }
 
-    IEnumerator LoadEndSceneAfterDelay(string sceneName, float delay)
+    private IEnumerator LoadEndSceneAfterDelay(string sceneName, float delay)
     {
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(sceneName);
