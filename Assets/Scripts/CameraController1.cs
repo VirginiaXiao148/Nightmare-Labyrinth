@@ -74,10 +74,4 @@ public class CameraController1 : MonoBehaviour
         // Ensure the camera always faces the player
         transform.LookAt(player.transform.position);
     }
-
-    void StartPoint()
-    {
-        // Set the camera's initial position to the player's position
-        transform.position = player.transform.position;
-    }
 }
