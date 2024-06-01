@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class CameraController1 : MonoBehaviour
 {
-    public Transform player; // Reference to the player Transform
+    public GameObject player; // Reference to the player GameObject
+
     public float distance = 2.0f; // Distance between the camera and the player
+
     public float rotationSpeed = 5f; // Speed at which the camera rotates
 
-    private float yaw;   // Horizontal rotation angle
-    private float pitch; // Vertical rotation angle
+    public float speedH = 2; // Horizontal rotation speed
+    public float speedV = 2; // Vertical rotation speed
+
+    float yaw;   // Horizontal rotation angle
+    float pitch; // Vertical rotation angle
+
+    public float smoothTime = 0.1f; // Smoothing time for camera movement
+    private Vector3 velocity = Vector3.zero; // Velocity used for smoothing
 
     // Start is called before the first frame update
     void Start()
@@ -18,22 +26,38 @@ public class CameraController1 : MonoBehaviour
         Cursor.visible = false; // Hides the cursor for more immersive camera control
 
         // Initialize the rotation angles
-        yaw = player.eulerAngles.y;
-        pitch = 0; // Usually start with zero pitch
+        yaw = player.transform.eulerAngles.y;
+        pitch = 0; // Initialize pitch to 0 to avoid any unexpected rotation
+
+        // Set the initial position of the camera
+        UpdateCameraPosition();
     }
 
     // LateUpdate is called after all Update functions have been called
     void LateUpdate()
     {
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked; // Re-lock the cursor if it has been unlocked
+            Cursor.visible = false; // Ensure the cursor remains invisible
+        }
+
         // Rotate the camera based on mouse movement
-        yaw += Input.GetAxis("Mouse X") * rotationSpeed;
-        pitch -= Input.GetAxis("Mouse Y") * rotationSpeed;
+        yaw += speedH * Input.GetAxis("Mouse X");
+        pitch -= speedV * Input.GetAxis("Mouse Y");
 
         // Clamp the pitch to prevent camera flip over
         pitch = Mathf.Clamp(pitch, -89f, 89f);
 
         // Update the camera position relative to the player
         UpdateCameraPosition();
+        //RotatePlayer();
+    }
+
+    void RotatePlayer()
+    {
+        // Rotate the player based on the camera's yaw rotation
+        player.transform.rotation = Quaternion.Euler(0, yaw, 0);
     }
 
     void UpdateCameraPosition()
@@ -41,9 +65,12 @@ public class CameraController1 : MonoBehaviour
         // Calculate the camera position using spherical coordinates
         Vector3 offset = new Vector3(0, 0, -distance);
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-        transform.position = player.position + rotation * offset;
+        Vector3 targetPosition = player.transform.position + rotation * offset;
+
+        // Use smooth damp to move the camera smoothly
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
 
         // Ensure the camera always faces the player
-        transform.LookAt(player);
+        transform.LookAt(player.transform.position);
     }
 }
