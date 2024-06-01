@@ -96,11 +96,6 @@ public class AricController : MonoBehaviour
         // Combining both horizontal and vertical inputs to get the direction
         Vector3 moveDirection = forward * vertical + right * horizontal;
 
-        if (Input.GetKey(KeyCode.S))
-        {
-            moveDirection = -forward;
-        }
-
         return moveDirection;
     }
 
