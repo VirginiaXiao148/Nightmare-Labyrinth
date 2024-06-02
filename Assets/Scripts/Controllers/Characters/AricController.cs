@@ -85,11 +85,11 @@ public class AricController : MonoBehaviour
         if (moveDirection != Vector3.zero)
         {
             controller.Move(moveDirection * playerSpeed * Time.deltaTime);
-            transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
+        transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
     }
 
     private Vector3 CalculateMoveDirection(float horizontal, float vertical)

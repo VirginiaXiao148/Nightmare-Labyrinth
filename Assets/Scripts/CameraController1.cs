@@ -67,7 +67,7 @@ public class CameraController1 : MonoBehaviour
         transform.position = Vector3.SmoothDamp(transform.position, adjustedPosition, ref velocity, smoothTime);
 
         // Ensure the camera always faces the player
-        transform.LookAt(player.transform.position + Vector3.up * 1.5f); // Adjust the LookAt target to focus on the player's upper body
+        transform.LookAt(player.transform.position + Vector3.up * 0.5f); // Adjust the LookAt target to focus on the player's upper body
     }
 
     Vector3 CalculateCameraPosition()
