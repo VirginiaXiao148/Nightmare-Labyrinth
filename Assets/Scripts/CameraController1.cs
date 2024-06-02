@@ -7,6 +7,8 @@ public class CameraController1 : MonoBehaviour
     public GameObject player; // Reference to the player GameObject
 
     public float distance = 2.0f; // Distance between the camera and the player
+    public float minDistance = 1.0f; // Minimum distance from the player
+    public float maxDistance = 3.0f; // Maximum distance from the player
 
     public float rotationSpeed = 5f; // Speed at which the camera rotates
 
@@ -51,26 +53,41 @@ public class CameraController1 : MonoBehaviour
 
         // Update the camera position relative to the player
         UpdateCameraPosition();
-        //RotatePlayer();
-    }
-
-    void RotatePlayer()
-    {
-        // Rotate the player based on the camera's yaw rotation
-        player.transform.rotation = Quaternion.Euler(0, yaw, 0);
     }
 
     void UpdateCameraPosition()
     {
-        // Calculate the camera position using spherical coordinates
-        Vector3 offset = new Vector3(0, 0, -distance);
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-        Vector3 targetPosition = player.transform.position + rotation * offset;
+        // Calculate the desired camera position
+        Vector3 desiredPosition = CalculateCameraPosition();
+
+        // Perform collision detection to adjust the camera's position
+        Vector3 adjustedPosition = CheckForCollisions(desiredPosition);
 
         // Use smooth damp to move the camera smoothly
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        transform.position = Vector3.SmoothDamp(transform.position, adjustedPosition, ref velocity, smoothTime);
 
         // Ensure the camera always faces the player
         transform.LookAt(player.transform.position);
+    }
+
+    Vector3 CalculateCameraPosition()
+    {
+        // Calculate the camera position using spherical coordinates
+        Vector3 offset = new Vector3(0, 0, -distance);
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+        return player.transform.position + rotation * offset;
+    }
+
+    Vector3 CheckForCollisions(Vector3 targetPosition)
+    {
+        RaycastHit hit;
+        if (Physics.Linecast(player.transform.position, targetPosition, out hit))
+        {
+            float adjustedDistance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
+            Vector3 offset = new Vector3(0, 0, -adjustedDistance);
+            Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+            return player.transform.position + rotation * offset;
+        }
+        return targetPosition;
     }
 }
