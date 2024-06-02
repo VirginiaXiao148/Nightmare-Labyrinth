@@ -67,13 +67,13 @@ public class CameraController1 : MonoBehaviour
         transform.position = Vector3.SmoothDamp(transform.position, adjustedPosition, ref velocity, smoothTime);
 
         // Ensure the camera always faces the player
-        transform.LookAt(player.transform.position);
+        transform.LookAt(player.transform.position + Vector3.up * 1.5f); // Adjust the LookAt target to focus on the player's upper body
     }
 
     Vector3 CalculateCameraPosition()
     {
         // Calculate the camera position using spherical coordinates
-        Vector3 offset = new Vector3(0, 0, -distance);
+        Vector3 offset = new Vector3(0, 1.5f, -distance); // Adjust the height offset to look over the player's shoulder
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
         return player.transform.position + rotation * offset;
     }
@@ -84,7 +84,7 @@ public class CameraController1 : MonoBehaviour
         if (Physics.Linecast(player.transform.position, targetPosition, out hit))
         {
             float adjustedDistance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
-            Vector3 offset = new Vector3(0, 0, -adjustedDistance);
+            Vector3 offset = new Vector3(0, 1.5f, -adjustedDistance); // Adjust the height offset to look over the player's shoulder
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
             return player.transform.position + rotation * offset;
         }
