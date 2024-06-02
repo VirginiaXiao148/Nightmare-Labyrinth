@@ -12,8 +12,10 @@ public class MazeGenerator : MonoBehaviour
 
     public GameObject wallPrefab;
     public GameObject spider;
+    public GameObject demon;
     public GameObject PortalPrefab;
     public int numberOfSpiders = 10;
+    public int numberOfDemons = 10;
 
     MazeCell[,] maze;
     Vector2Int currentCell;
@@ -146,6 +148,22 @@ public class MazeGenerator : MonoBehaviour
             Instantiate(spider, new Vector3(enemyPosition.x, 0, enemyPosition.y), Quaternion.identity);
             occupiedPositions.Add(enemyPosition);
         }
+        for (int i = 0; i < numberOfSpiders; i++)
+        {
+            Vector2Int enemyPosition = GenerateUniqueEnemyPosition(occupiedPositions);
+            Instantiate(demon, new Vector3(enemyPosition.x, 0, enemyPosition.y), Quaternion.identity);
+            occupiedPositions.Add(enemyPosition);
+        }
+        /*
+         * 
+         * for (int i = 0; i < numberOfSpiders; i++)
+        {
+            Vector2Int enemyPosition = GenerateUniqueEnemyPosition(occupiedPositions);
+            Instantiate(illusion, new Vector3(enemyPosition.x, 0, enemyPosition.y), Quaternion.identity);
+            occupiedPositions.Add(enemyPosition);
+        }
+         * 
+         * **/
     }
 
     Vector2Int GenerateUniqueEnemyPosition(List<Vector2Int> occupiedPositions)

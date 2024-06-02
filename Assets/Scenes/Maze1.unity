@@ -408,9 +408,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 671642813}
   distance: 2
+  minDistance: 1
+  maxDistance: 3
   rotationSpeed: 5
   speedH: 2
   speedV: 2
+  smoothTime: 0.1
 --- !u!1 &557198710
 GameObject:
   m_ObjectHideFlags: 0
