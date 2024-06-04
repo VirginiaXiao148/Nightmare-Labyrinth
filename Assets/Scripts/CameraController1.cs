@@ -46,10 +46,10 @@ public class CameraController1 : MonoBehaviour
 
         // Rotate the camera based on mouse movement
         yaw += speedH * Input.GetAxis("Mouse X");
-        pitch -= speedV * Input.GetAxis("Mouse Y");
+        // pitch -= speedV * Input.GetAxis("Mouse Y"); // Comment out this line to disable vertical movement
 
         // Clamp the pitch to prevent camera flip over
-        pitch = Mathf.Clamp(pitch, -89f, 89f);
+        // pitch = Mathf.Clamp(pitch, -89f, 89f); // Comment out this line as well since we're not changing the pitch anymore
 
         // Update the camera position relative to the player
         UpdateCameraPosition();
