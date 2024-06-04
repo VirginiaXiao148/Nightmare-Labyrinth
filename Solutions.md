@@ -1,3 +1,13 @@
+# Problems
+
+when I'm trying the game, after I play it in Unity, the game freezes
+
+
+# Causes
+
+Game freezing can be caused by a variety of issues, such as infinite loops, heavy computations, or memory leaks
+
+
 # Solutions
 
 # Camera
@@ -36,7 +46,7 @@ Check if the freezing occurs when the camera collides with an object. If so, you
 
 # AricController
 
-
+If the player is clicking the mouse button rapidly, it could start many instances of this coroutine, which might cause performance issues.
 
 
 

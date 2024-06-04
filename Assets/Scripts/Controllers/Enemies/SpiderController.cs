@@ -69,17 +69,10 @@ public class SpiderController : MonoBehaviour
             Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
             rb.MovePosition(newPosition);
 
-            if (IsPlayerInSight())
+            // Follow the player as long as the player is alive
+            if (player != null)
             {
-                float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
-                {
-                    AttackPlayer();
-                }
-                else if (distanceToPlayer > attackRange)
-                {
-                    FollowPlayer();
-                }
+                FollowPlayer();
             }
         }
 
@@ -94,6 +87,7 @@ public class SpiderController : MonoBehaviour
     bool IsBlocked(Vector3 direction)
     {
         RaycastHit hit;
+        // Check if there's any object in the given direction within a certain distance
         return Physics.Raycast(transform.position, direction, out hit, 3f) && hit.collider.CompareTag("Wall");
     }
 
@@ -139,6 +133,17 @@ public class SpiderController : MonoBehaviour
         return false;
     }
 
+    /* void FollowPlayer()
+    {
+        if (!animation.IsPlaying("Run"))
+        {
+            PlayRunAnimation();
+        }
+
+        Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+        rb.MovePosition(newPosition);
+    } */
+
     void FollowPlayer()
     {
         if (!animation.IsPlaying("Run"))
@@ -148,6 +153,13 @@ public class SpiderController : MonoBehaviour
 
         Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
         rb.MovePosition(newPosition);
+
+        // Attack the player if within range and attack cooldown has passed
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+        {
+            AttackPlayer();
+        }
     }
 
     void AttackPlayer()
