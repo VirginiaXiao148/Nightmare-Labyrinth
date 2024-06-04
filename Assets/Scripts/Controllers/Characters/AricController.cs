@@ -120,13 +120,33 @@ public class AricController : MonoBehaviour
         animator.SetBool("Left", Input.GetKey(KeyCode.A));
     }
 
+    private bool isAttacking = false;
+
     private void HandleAttack()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !isAttacking)
         {
             animator.SetTrigger("Attack");
             StartCoroutine(HandleDelayedAttack());
         }
+    }
+
+    private IEnumerator HandleDelayedAttack()
+    {
+        isAttacking = true;
+        yield return new WaitForSeconds(0.5f);
+        audioSource.Play();
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange))
+        {
+            SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
+            if (spiderController != null)
+            {
+                spiderController.TakeDamage(attackDamage);
+            }
+        }
+        isAttacking = false;
     }
 
     private IEnumerator HandleDelayedAttack()
