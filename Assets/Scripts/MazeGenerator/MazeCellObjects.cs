@@ -14,5 +14,4 @@ public class MazeCellObjects : MonoBehaviour{
         bottomWall.SetActive(bottom);
         leftWall.SetActive(left);
     }
-
 }
