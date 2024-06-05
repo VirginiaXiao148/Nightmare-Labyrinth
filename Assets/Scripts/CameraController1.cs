@@ -6,9 +6,9 @@ public class CameraController1 : MonoBehaviour
 {
     public GameObject player; // Reference to the player GameObject
 
-    public float distance = 2.0f; // Distance between the camera and the player
+    public float distance = 1.0f; // Distance between the camera and the player
     public float minDistance = 1.0f; // Minimum distance from the player
-    public float maxDistance = 3.0f; // Maximum distance from the player
+    public float maxDistance = 2.0f; // Maximum distance from the player
 
     public float rotationSpeed = 5f; // Speed at which the camera rotates
 
@@ -73,7 +73,7 @@ public class CameraController1 : MonoBehaviour
     Vector3 CalculateCameraPosition()
     {
         // Calculate the camera position using spherical coordinates
-        Vector3 offset = new Vector3(0, 1.5f, -distance); // Adjust the height offset to look over the player's shoulder
+        Vector3 offset = new Vector3(0, 0.5f, -distance); // Adjust the height offset to look over the player's shoulder
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
         return player.transform.position + rotation * offset;
     }
@@ -84,7 +84,7 @@ public class CameraController1 : MonoBehaviour
         if (Physics.Linecast(player.transform.position, targetPosition, out hit))
         {
             float adjustedDistance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
-            Vector3 offset = new Vector3(0, 1.5f, -adjustedDistance); // Adjust the height offset to look over the player's shoulder
+            Vector3 offset = new Vector3(0, 1.0f, -adjustedDistance); // Adjust the height offset to look over the player's shoulder
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
             return player.transform.position + rotation * offset;
         }

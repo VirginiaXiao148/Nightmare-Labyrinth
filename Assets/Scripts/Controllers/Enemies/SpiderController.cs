@@ -1,160 +1,70 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class SpiderController : MonoBehaviour
 {
     public float moveSpeed = 0.5f;
-    private Vector3 moveDirection;
-
-    private bool isStunned = false;
-
-    private float changeDirectionInterval = 2f;
-    private float timer;
-
-    public float maxHealthSpider = 30;
-    private float currentHealth;
-    public HealthBar healthBar;
+    public float rotationSpeed = 5f;
+    public float detectionRadius = 10f;
 
     public float attackRange = 1.5f;
     public int attackDamage = 5;
     public float attackCooldown = 2f;
     private float lastAttackTime;
 
-    public string id;
-
-    public float fieldOfViewAngle = 90f;
-    public float detectionRadius = 10f;
+    public float maxHealthSpider = 30;
+    private float currentHealth;
+    public HealthBar healthBar;
 
     private Transform player;
-    public LayerMask playerLayer;
 
     private Animation animation;
     private Rigidbody rb;
 
-    private float knockbackForce = 5f;
+    private bool isStunned = false; // Agregar esta línea
+    public float knockbackForce = 5f; // Agregar esta línea
 
-    void Start()
+    private void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        animation = GetComponent<Animation>();
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        id = System.Guid.NewGuid().ToString();
-
         currentHealth = maxHealthSpider;
         healthBar.SetHealth(currentHealth, maxHealthSpider);
-
-        animation = GetComponent<Animation>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        ChangeDirection();
-
-        Debug.Log("Current health " + currentHealth);
     }
 
-    void Update()
+    private void Update()
     {
-        if (!isStunned)
-        {
-            timer += Time.deltaTime;
-            if (timer >= changeDirectionInterval)
-            {
-                ChangeDirection();
-                timer = 0f;
-            }
-
-            Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
-            rb.MovePosition(newPosition);
-
-            // Follow the player as long as the player is alive
-            if (player != null)
-            {
-                FollowPlayer();
-            }
-        }
-
-        Debug.Log(getLife());
+        MoveTowardsPlayer();
+        CheckForPlayer();
     }
 
-    string getLife()
+    private void MoveTowardsPlayer()
     {
-        return "Araña " + id + " y su vida es " + currentHealth;
-    }
+        if (player == null)
+            return;
 
-    bool IsBlocked(Vector3 direction)
-    {
-        RaycastHit hit;
-        // Check if there's any object in the given direction within a certain distance
-        return Physics.Raycast(transform.position, direction, out hit, 3f) && hit.collider.CompareTag("Wall");
-    }
-
-    void ChangeDirection()
-    {
         if (!animation.IsPlaying("Walk"))
         {
             PlayWalkAnimation();
         }
 
-        bool foundValidDirection = false;
-        Vector3 randomDirection = Vector3.zero;
-
-        while (!foundValidDirection)
-        {
-            float randomX = Random.Range(-1f, 1f);
-            float randomZ = Random.Range(-1f, 1f);
-            randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
-
-            if (!IsBlocked(randomDirection))
-            {
-                foundValidDirection = true;
-            }
-        }
-
-        moveDirection = randomDirection;
-        transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        Vector3 direction = (player.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+        transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
-    bool IsPlayerInSight()
+    private void CheckForPlayer()
     {
-        RaycastHit hit;
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
+        if (player == null)
+            return;
 
-        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
-        {
-            if (hit.collider.CompareTag("Player"))
-            {
-                Debug.Log("Player seen!");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /* void FollowPlayer()
-    {
-        if (!animation.IsPlaying("Run"))
-        {
-            PlayRunAnimation();
-        }
-
-        Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
-        rb.MovePosition(newPosition);
-    } */
-
-    void FollowPlayer()
-    {
-        if (!animation.IsPlaying("Run"))
-        {
-            PlayRunAnimation();
-        }
-
-        Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
-        rb.MovePosition(newPosition);
-
-        // Attack the player if within range and attack cooldown has passed
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
         {
@@ -162,8 +72,9 @@ public class SpiderController : MonoBehaviour
         }
     }
 
-    void AttackPlayer()
+    private void AttackPlayer()
     {
+        Debug.Log("Player detected! Attacking...");
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
         if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
@@ -174,7 +85,6 @@ public class SpiderController : MonoBehaviour
                 Debug.Log("Player in sight and hit by raycast");
                 animation.Play("Attack");
                 player.GetComponent<AricController>().TakeDamage(attackDamage);
-                lastAttackTime = Time.time;
             }
         }
     }

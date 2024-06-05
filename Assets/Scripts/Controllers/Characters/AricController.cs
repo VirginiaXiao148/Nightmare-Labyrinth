@@ -22,7 +22,7 @@ public class AricController : MonoBehaviour
 
     private Vector3 playerVelocity;
     private bool groundedPlayer;
-    private float playerSpeed = 3f;
+    private float playerSpeed = 1f;
     private float jumpHeight = 0.5f;
     private float gravityValue = -9.81f;
 
@@ -60,7 +60,7 @@ public class AricController : MonoBehaviour
             HandleJumping();
             HandleAnimations();
             HandleAttack();
-            UpdateHealth();
+            //UpdateHealth();
         }
         catch (System.Exception ex)
         {
@@ -85,11 +85,12 @@ public class AricController : MonoBehaviour
         if (moveDirection != Vector3.zero)
         {
             controller.Move(moveDirection * playerSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
-        transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        //transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
     }
 
     private Vector3 CalculateMoveDirection(float horizontal, float vertical)
@@ -149,22 +150,6 @@ public class AricController : MonoBehaviour
         isAttacking = false;
     }
 
-    private IEnumerator HandleDelayedAttack()
-    {
-        yield return new WaitForSeconds(0.5f);
-        audioSource.Play();
-
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange))
-        {
-            SpiderController spiderController = hit.collider.GetComponent<SpiderController>();
-            if (spiderController != null)
-            {
-                spiderController.TakeDamage(attackDamage);
-            }
-        }
-    }
-
     private void UpdateHealth()
     {
         healthBar.fillAmount = (float)currentHealth / maxHealth;
@@ -174,6 +159,7 @@ public class AricController : MonoBehaviour
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
+        UpdateHealth();
         animator.SetBool("DamageTaken", true);
         if (currentHealth <= 0)
         {
@@ -186,16 +172,6 @@ public class AricController : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         animator.SetBool("DamageTaken", false);
-    }
-
-    public void TakeMentalDamage(float mentalDamage)
-    {
-        currentMentalHealth -= mentalDamage;
-        animator.SetBool("DamageTaken", true);
-        if (currentMentalHealth <= 0)
-        {
-            Die();
-        }
     }
 
     private void Die()
