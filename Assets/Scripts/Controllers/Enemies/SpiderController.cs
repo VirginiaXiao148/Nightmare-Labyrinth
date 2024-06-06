@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpiderController : MonoBehaviour
 {
@@ -62,8 +63,9 @@ public class SpiderController : MonoBehaviour
 
     private void CheckForPlayer()
     {
-        if (player == null)
-            return;
+        if (player == null){
+            SceneManager.LoadScene("EndScene");
+        }
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)

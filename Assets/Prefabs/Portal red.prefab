@@ -14577,6 +14577,7 @@ GameObject:
   - component: {fileID: 160371977315982771}
   - component: {fileID: 6433945835423389772}
   - component: {fileID: 6088189790623085154}
+  - component: {fileID: -4468040657145051461}
   m_Layer: 0
   m_Name: Portal red
   m_TagString: Untagged
@@ -19457,3 +19458,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &-4468040657145051461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7494077095689113452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f3bfa91e320faa48bb0ddf3cbc2996b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

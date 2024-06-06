@@ -4,76 +4,67 @@ using UnityEngine;
 
 public class CameraController1 : MonoBehaviour
 {
-    public GameObject player; // Reference to the player GameObject
+    public GameObject player; // Referencia al objeto del jugador
 
-    public float distance = 1.0f; // Distance between the camera and the player
-    public float minDistance = 1.0f; // Minimum distance from the player
-    public float maxDistance = 2.0f; // Maximum distance from the player
+    public float distance = 0.3f; // Distancia entre la cámara y el jugador (reducida para una vista más cercana)
+    public float minDistance = 0.2f; // Distancia mínima desde el jugador
+    public float maxDistance = 0.4f; // Distancia máxima desde el jugador
 
-    public float rotationSpeed = 5f; // Speed at which the camera rotates
+    public float rotationSpeed = 5f; // Velocidad de rotación de la cámara
+    public float speedH = 2f; // Velocidad de rotación horizontal
 
-    public float speedH = 2; // Horizontal rotation speed
-    public float speedV = 2; // Vertical rotation speed
+    private float yaw;   // Ángulo de rotación horizontal
+    private float pitch = 50f; // Ángulo de rotación vertical, inicializado a 50 grados
 
-    float yaw;   // Horizontal rotation angle
-    float pitch; // Vertical rotation angle
+    public float smoothTime = 0.1f; // Tiempo de suavizado para el movimiento de la cámara
+    private Vector3 velocity = Vector3.zero; // Velocidad utilizada para el suavizado
 
-    public float smoothTime = 0.1f; // Smoothing time for camera movement
-    private Vector3 velocity = Vector3.zero; // Velocity used for smoothing
-
-    // Start is called before the first frame update
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Locks the cursor in the center of the screen
-        Cursor.visible = false; // Hides the cursor for more immersive camera control
+        Cursor.lockState = CursorLockMode.Locked; // Bloquea el cursor en el centro de la pantalla
+        Cursor.visible = false; // Oculta el cursor para un control de cámara más inmersivo
 
-        // Initialize the rotation angles
+        // Inicializa los ángulos de rotación
         yaw = player.transform.eulerAngles.y;
-        pitch = 0; // Initialize pitch to 0 to avoid any unexpected rotation
 
-        // Set the initial position of the camera
+        // Establece la posición inicial de la cámara
         UpdateCameraPosition();
     }
 
-    // LateUpdate is called after all Update functions have been called
     void LateUpdate()
     {
         if (Cursor.lockState != CursorLockMode.Locked)
         {
-            Cursor.lockState = CursorLockMode.Locked; // Re-lock the cursor if it has been unlocked
-            Cursor.visible = false; // Ensure the cursor remains invisible
+            Cursor.lockState = CursorLockMode.Locked; // Vuelve a bloquear el cursor si se ha desbloqueado
+            Cursor.visible = false; // Asegúrate de que el cursor permanezca invisible
         }
 
-        // Rotate the camera based on mouse movement
+        // Rota la cámara en función del movimiento del ratón
         yaw += speedH * Input.GetAxis("Mouse X");
-        // pitch -= speedV * Input.GetAxis("Mouse Y"); // Comment out this line to disable vertical movement
 
-        // Clamp the pitch to prevent camera flip over
-        // pitch = Mathf.Clamp(pitch, -89f, 89f); // Comment out this line as well since we're not changing the pitch anymore
-
-        // Update the camera position relative to the player
+        // Actualiza la posición de la cámara en relación con el jugador
         UpdateCameraPosition();
     }
 
     void UpdateCameraPosition()
     {
-        // Calculate the desired camera position
+        // Calcula la posición deseada de la cámara
         Vector3 desiredPosition = CalculateCameraPosition();
 
-        // Perform collision detection to adjust the camera's position
+        // Realiza la detección de colisiones para ajustar la posición de la cámara
         Vector3 adjustedPosition = CheckForCollisions(desiredPosition);
 
-        // Use smooth damp to move the camera smoothly
+        // Usa smooth damp para mover la cámara de manera suave
         transform.position = Vector3.SmoothDamp(transform.position, adjustedPosition, ref velocity, smoothTime);
 
-        // Ensure the camera always faces the player
-        transform.LookAt(player.transform.position + Vector3.up * 0.5f); // Adjust the LookAt target to focus on the player's upper body
+        // Asegúrate de que la cámara siempre mire al jugador
+        transform.LookAt(player.transform.position + Vector3.up * 1.5f); // Ajusta el objetivo LookAt para enfocar en la parte superior del cuerpo del jugador
     }
 
     Vector3 CalculateCameraPosition()
     {
-        // Calculate the camera position using spherical coordinates
-        Vector3 offset = new Vector3(0, 0.5f, -distance); // Adjust the height offset to look over the player's shoulder
+        // Calcula la posición de la cámara usando coordenadas esféricas
+        Vector3 offset = new Vector3(0, 0.5f, -distance); // Ajusta el offset de altura para mirar sobre el hombro del jugador
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
         return player.transform.position + rotation * offset;
     }
@@ -84,7 +75,7 @@ public class CameraController1 : MonoBehaviour
         if (Physics.Linecast(player.transform.position, targetPosition, out hit))
         {
             float adjustedDistance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
-            Vector3 offset = new Vector3(0, 1.0f, -adjustedDistance); // Adjust the height offset to look over the player's shoulder
+            Vector3 offset = new Vector3(0, 0.5f, -adjustedDistance); // Ajusta el offset de altura para mirar sobre el hombro del jugador
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
             return player.transform.position + rotation * offset;
         }
