@@ -279,7 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mazeGenerator: {fileID: 224379658}
-  mazeCellPrefab: {fileID: 620139918189056500, guid: 144a805a8a8bf3845b08d94db2698e42, type: 3}
+  mazeCellPrefab: {fileID: 4343478489080307292, guid: abe1eeb9dffe054459961b7db06ca32e, type: 3}
   cellSize: 1
 --- !u!114 &224379658
 MonoBehaviour:
@@ -297,7 +297,7 @@ MonoBehaviour:
   mazeHeight: 15
   startX: 0
   startY: 0
-  wallPrefab: {fileID: 620139918189056500, guid: 144a805a8a8bf3845b08d94db2698e42, type: 3}
+  wallPrefab: {fileID: 4343478489080307292, guid: abe1eeb9dffe054459961b7db06ca32e, type: 3}
   spider: {fileID: 6440129996965406069, guid: 6b06cdf59fe735d499fa3ddb0ba9a5d0, type: 3}
   demon: {fileID: 8507017206843494971, guid: 92c8ec50899368b448325a3289d09a35, type: 3}
   PortalPrefab: {fileID: 7494077095689113452, guid: 04f07d17358228d4d83d4e539464d6ce, type: 3}
@@ -640,8 +640,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -489, y: 232}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -531, y: 190}
+  m_SizeDelta: {x: 190, y: 190}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &820866726
 MonoBehaviour:
@@ -712,7 +712,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 979, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1275342573
@@ -1106,8 +1106,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -490, y: 233}
-  m_SizeDelta: {x: 110, y: 110}
+  m_AnchoredPosition: {x: -532, y: 192}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1892010769
 MonoBehaviour:
