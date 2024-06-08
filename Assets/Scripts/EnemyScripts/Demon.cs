@@ -23,19 +23,35 @@ public class Demon : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = false;
-        rb.useGravity = true;
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody component missing from this game object");
+        }
+        else
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        }
 
         currentHealth = maxHealthDemon;
         healthBar.SetHealth(currentHealth, maxHealthDemon);
 
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        if (player == null)
+        {
+            Debug.LogError("Player not found in the scene.");
+        }
+
         lastAttackTime = -attackCooldown;
     }
 
     void Update()
     {
+        if (player == null) return;
+
         transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
         animator.SetBool("Walking", true);
 
@@ -51,7 +67,6 @@ public class Demon : MonoBehaviour
         if (Time.time > lastAttackTime + attackCooldown)
         {
             animator.SetBool("Punching1", true);
-            // Implementa el código para atacar al jugador
             player.GetComponent<AricController>().TakeDamage(attackDamage);
             lastAttackTime = Time.time;
         }
@@ -62,7 +77,7 @@ public class Demon : MonoBehaviour
         animator.SetBool("Stunned", true);
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth, maxHealthDemon);
-        Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
+        Debug.Log("Demon takes " + damage + " damage, health is now " + currentHealth);
 
         if (currentHealth <= 0)
         {
@@ -72,7 +87,7 @@ public class Demon : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("Enemy died!");
+        Debug.Log("Demon died!");
         gameObject.SetActive(false);
     }
 }
