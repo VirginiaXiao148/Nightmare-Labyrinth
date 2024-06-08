@@ -88,6 +88,12 @@ public class AricController : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
         }
 
+        /* if (moveDirection.magnitude >= 0.1f)
+        {
+            controller.Move(moveDirection * playerSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        } */
+
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
         //transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
@@ -107,10 +113,16 @@ public class AricController : MonoBehaviour
 
     private void HandleJumping()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && groundedPlayer)
+        /* if (Input.GetKeyDown(KeyCode.Space) && groundedPlayer)
         {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+            playerVelocity.y += Mathf.Sqrt(jumpHeight * -2 * gravityValue);
+        } */
+
+        if (Input.GetButtonDown("Jump") && groundedPlayer)
+        {
+            playerVelocity.y += Mathf.Sqrt(jumpHeight * -2 * gravityValue);
         }
+
     }
 
     private void HandleAnimations()

@@ -546,6 +546,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1968034711160186978, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
+      propertyPath: minimapCamera
+      value: 
+      objectReference: {fileID: 1275342576}
     - target: {fileID: 4091844253382449487, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
       propertyPath: healthBar
       value: 
@@ -558,6 +562,14 @@ PrefabInstance:
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 338243370}
+    - target: {fileID: 7233694188595423328, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
+      propertyPath: m_Parameters.textureScale.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7233694188595423328, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
+      propertyPath: m_Parameters.textureScale.y
+      value: 0.3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -712,7 +724,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 979, y: 0}
+  m_AnchoredPosition: {x: 84, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1275342573
@@ -728,7 +740,7 @@ GameObject:
   - component: {fileID: 1275342574}
   m_Layer: 0
   m_Name: MazeCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
