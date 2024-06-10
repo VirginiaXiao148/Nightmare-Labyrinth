@@ -6,37 +6,23 @@ using UnityEngine.UI;
 
 public class EndGameController : MonoBehaviour
 {
-    public Text timeText;
-
-    private float startTime;
+    public Text playTimeText;
+    public Button retryButton;
+    public Button startButton;
 
     private void Start()
     {
-        startTime = PlayerPrefs.GetFloat("StartTime"); // Obtener el tiempo de inicio guardado
-        UpdateTimePlayed();
+        float playTime = GameManager.instance.GetPlayTime();
+        playTimeText.text = "Tiempo de juego: " + FormatTime(playTime);
+
+        retryButton.onClick.AddListener(GameManager.instance.RestartGame);
+        startButton.onClick.AddListener(GameManager.instance.GoToStartScene);
     }
 
-    private void Update()
+    private string FormatTime(float time)
     {
-        UpdateTimePlayed();
-    }
-
-    private void UpdateTimePlayed()
-    {
-        float timePlayed = Time.time - startTime;
-        string minutes = Mathf.Floor(timePlayed / 60).ToString("00");
-        string seconds = Mathf.Floor(timePlayed % 60).ToString("00");
-        timeText.text = "Time Played: " + minutes + ":" + seconds;
-    }
-
-    public void ReplayGame()
-    {
-        SceneManager.LoadScene("MainScene"); // Cargar la escena principal del juego
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit(); // Salir del juego
+        int minutes = Mathf.FloorToInt(time / 60F);
+        int seconds = Mathf.FloorToInt(time % 60F);
+        return string.Format("{0:0}:{1:00}", minutes, seconds);
     }
 }
-

@@ -3,81 +3,114 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Demon : MonoBehaviour
+public class DemonController : MonoBehaviour
 {
-    public float maxHealthDemon = 50;
+    public float maxHealth = 50;
     private float currentHealth;
     public HealthBar healthBar;
 
-    public float moveSpeed = 5f;
+    public float moveSpeed = 0.5f;
+    public float rotationSpeed = 5f;
+    public float detectionRadius = 10f;
     public float attackRange = 1.5f;
     public int attackDamage = 20;
     public float attackCooldown = 1.5f;
-    private Transform player;
     private float lastAttackTime;
 
+    private Transform player;
     private Animator animator;
     private Rigidbody rb;
 
-    void Start()
+    private bool isStunned = false;
+    public float knockbackForce = 5f;
+
+    private void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        if (player == null)
+        {
+            Debug.LogError("Player not found in the scene.");
+            return;
+        }
+
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
 
         if (rb == null)
         {
             Debug.LogError("Rigidbody component missing from this game object");
-        }
-        else
-        {
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            return;
         }
 
-        currentHealth = maxHealthDemon;
-        healthBar.SetHealth(currentHealth, maxHealthDemon);
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
-
-        if (player == null)
-        {
-            Debug.LogError("Player not found in the scene.");
-        }
-
+        currentHealth = maxHealth;
+        healthBar.SetHealth(currentHealth, maxHealth);
         lastAttackTime = -attackCooldown;
     }
 
-    void Update()
+    private void Update()
     {
-        if (player == null) return;
+        if (player == null)
+        {
+            return;
+        }
 
-        transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
-        animator.SetBool("Walking", true);
+        MoveTowardsPlayer();
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer < attackRange)
+        if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
         {
             AttackPlayer();
         }
     }
 
-    void AttackPlayer()
+    private void MoveTowardsPlayer()
     {
-        if (Time.time > lastAttackTime + attackCooldown)
+        if (isStunned)
         {
-            animator.SetBool("Punching1", true);
-            player.GetComponent<AricController>().TakeDamage(attackDamage);
-            lastAttackTime = Time.time;
+            return;
         }
+
+        animator.SetBool("Walking", true);
+
+        Vector3 direction = (player.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+    }
+
+    private void AttackPlayer()
+    {
+        if (isStunned || player == null)
+        {
+            return;
+        }
+
+        Debug.Log("Player detected! Attacking...");
+        animator.SetBool("Walking", false);
+        animator.SetBool("Punching1", true);
+        player.GetComponent<AricController>().TakeDamage(attackDamage);
+        lastAttackTime = Time.time;
     }
 
     public void TakeDamage(float damage)
     {
         animator.SetBool("Stunned", true);
         currentHealth -= damage;
-        healthBar.SetHealth(currentHealth, maxHealthDemon);
+        healthBar.SetHealth(currentHealth, maxHealth);
         Debug.Log("Demon takes " + damage + " damage, health is now " + currentHealth);
+
+        Vector3 knockbackDirection = (transform.position - player.position).normalized;
+        rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+
+        if (!isStunned)
+        {
+            StartCoroutine(StunEnemy(2.0f));
+        }
 
         if (currentHealth <= 0)
         {
@@ -85,9 +118,18 @@ public class Demon : MonoBehaviour
         }
     }
 
-    void Die()
+    private IEnumerator StunEnemy(float duration)
+    {
+        isStunned = true;
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+        animator.SetBool("Stunned", false);
+    }
+
+    private void Die()
     {
         Debug.Log("Demon died!");
+        animator.SetBool("Dead", true);
         gameObject.SetActive(false);
     }
 }

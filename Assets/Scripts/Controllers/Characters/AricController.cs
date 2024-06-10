@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class AricController : MonoBehaviour
 {
     public float rotationSpeed = 5f;
-    public Camera mainCamera;
+    
     public int maxHealth = 100;
     public Image healthBar;
     public Text healthText;
@@ -14,8 +14,8 @@ public class AricController : MonoBehaviour
     public float attackRange = 1.5f;
     private int currentHealth;
 
-    public float mentalHealth = 100;
-    private float currentMentalHealth;
+    public Camera mainCamera;
+    public Transform cameraTarget;
 
     private MazeGenerator mazeGenerator;
     private CharacterController controller;
@@ -35,7 +35,6 @@ public class AricController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
 
         currentHealth = maxHealth;
-        currentMentalHealth = mentalHealth;
 
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
@@ -56,6 +55,7 @@ public class AricController : MonoBehaviour
     {
         try
         {
+            HandleRotation();
             HandleMovement();
             HandleJumping();
             HandleAnimations();
@@ -66,6 +66,14 @@ public class AricController : MonoBehaviour
         {
             Debug.LogError("Error in Update method: " + ex.Message);
         }
+    }
+
+    private void HandleRotation()
+    {
+        Vector3 direction = mainCamera.transform.position - transform.position;
+        direction.y = 0; // Mantener la dirección en el plano horizontal
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = rotation;
     }
 
     private void HandleMovement()
@@ -80,27 +88,6 @@ public class AricController : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        Vector3 moveDirection = CalculateMoveDirection(horizontal, vertical);
-
-        if (moveDirection != Vector3.zero)
-        {
-            controller.Move(moveDirection * playerSpeed * Time.deltaTime);
-            transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-        }
-
-        /* if (moveDirection.magnitude >= 0.1f)
-        {
-            controller.Move(moveDirection * playerSpeed * Time.deltaTime);
-            transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-        } */
-
-        playerVelocity.y += gravityValue * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
-        //transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-    }
-
-    private Vector3 CalculateMoveDirection(float horizontal, float vertical)
-    {
         Vector3 forward = mainCamera.transform.forward;
         Vector3 right = mainCamera.transform.right;
         forward.y = 0;
@@ -108,21 +95,23 @@ public class AricController : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        return forward * vertical + right * horizontal;
+        Vector3 moveDirection = forward * vertical + right * horizontal;
+
+        if (moveDirection != Vector3.zero)
+        {
+            controller.Move(moveDirection * playerSpeed * Time.deltaTime);
+        }
+
+        playerVelocity.y += gravityValue * Time.deltaTime;
+        controller.Move(playerVelocity * Time.deltaTime);
     }
 
     private void HandleJumping()
     {
-        /* if (Input.GetKeyDown(KeyCode.Space) && groundedPlayer)
-        {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -2 * gravityValue);
-        } */
-
         if (Input.GetButtonDown("Jump") && groundedPlayer)
         {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -2 * gravityValue);
+            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3 * gravityValue);
         }
-
     }
 
     private void HandleAnimations()
@@ -173,11 +162,11 @@ public class AricController : MonoBehaviour
         currentHealth -= damageAmount;
         UpdateHealth();
         animator.SetBool("DamageTaken", true);
+        StartCoroutine(ResetTakeDamageAnimation());
         if (currentHealth <= 0)
         {
             Die();
         }
-        StartCoroutine(ResetTakeDamageAnimation());
     }
 
     private IEnumerator ResetTakeDamageAnimation()
@@ -190,12 +179,6 @@ public class AricController : MonoBehaviour
     {
         animator.SetBool("Death", true);
         gameObject.SetActive(false);
-        StartCoroutine(LoadEndSceneAfterDelay("EndScene", 2.0f));
-    }
-
-    private IEnumerator LoadEndSceneAfterDelay(string sceneName, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(sceneName);
+        SceneManager.LoadScene("EndGame");
     }
 }

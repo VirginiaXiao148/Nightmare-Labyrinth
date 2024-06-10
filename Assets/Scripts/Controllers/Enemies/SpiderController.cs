@@ -47,8 +47,9 @@ public class SpiderController : MonoBehaviour
 
     private void MoveTowardsPlayer()
     {
-        if (player == null)
+        if (player == null){
             return;
+        }
 
         if (!animation.IsPlaying("Walk"))
         {
@@ -64,7 +65,7 @@ public class SpiderController : MonoBehaviour
     private void CheckForPlayer()
     {
         if (player == null){
-            SceneManager.LoadScene("EndScene");
+            SceneManager.LoadScene("EndGame");
         }
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);

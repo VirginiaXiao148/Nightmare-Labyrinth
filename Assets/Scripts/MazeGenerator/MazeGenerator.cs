@@ -148,7 +148,7 @@ public class MazeGenerator : MonoBehaviour
             Instantiate(spider, new Vector3(enemyPosition.x, 0, enemyPosition.y), Quaternion.identity);
             occupiedPositions.Add(enemyPosition);
         }
-        for (int i = 0; i < numberOfSpiders; i++)
+        for (int i = 0; i < numberOfDemons; i++)
         {
             Vector2Int enemyPosition = GenerateUniqueEnemyPosition(occupiedPositions);
             Instantiate(demon, new Vector3(enemyPosition.x, 0, enemyPosition.y), Quaternion.identity);

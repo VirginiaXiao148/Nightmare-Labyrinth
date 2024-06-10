@@ -4,47 +4,80 @@ using UnityEngine;
 
 public class CameraController1 : MonoBehaviour
 {
-    public GameObject player; // Referencia al objeto del jugador
+        public GameObject player; // Reference to the player GameObject
 
-    public float distance = 0.3f; // Distancia entre la cámara y el jugador (reducida para una vista más cercana)
-    public float minDistance = 0.2f; // Distancia mínima desde el jugador
-    public float maxDistance = 0.4f; // Distancia máxima desde el jugador
+    public float distance = 0.5f; // Vector representing the distance between the camera and the player
+    public float minDistance = 0.2f; // Minimum distance from the player
+    public float maxDistance = 0.4f; // Maximum distance from the player
 
-    public float rotationSpeed = 5f; // Velocidad de rotación de la cámara
-    public float speedH = 2f; // Velocidad de rotación horizontal
+    public float rotationSpeed = 5f; // Speed at which the camera rotates
 
-    private float yaw;   // Ángulo de rotación horizontal
-    private float pitch = 50f; // Ángulo de rotación vertical, inicializado a 50 grados
+    public float speedH = 2;
+    public float speedV = 2;
 
     public float smoothTime = 0.1f; // Tiempo de suavizado para el movimiento de la cámara
     private Vector3 velocity = Vector3.zero; // Velocidad utilizada para el suavizado
 
+    float yaw;
+    float pitch;
+
+    // Start is called before the first frame update
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Bloquea el cursor en el centro de la pantalla
-        Cursor.visible = false; // Oculta el cursor para un control de cámara más inmersivo
 
-        // Inicializa los ángulos de rotación
+        Cursor.lockState = CursorLockMode.Locked; // Locks the cursor in the center of the screen
+        Cursor.visible = false; // Hides the cursor for a more immersive camera control
+
+        // Inicializa la rotación y posición de la cámara
         yaw = player.transform.eulerAngles.y;
-
-        // Establece la posición inicial de la cámara
+        
         UpdateCameraPosition();
     }
 
+    // LateUpdate is called after all Update functions have been called
     void LateUpdate()
     {
         if (Cursor.lockState != CursorLockMode.Locked)
         {
-            Cursor.lockState = CursorLockMode.Locked; // Vuelve a bloquear el cursor si se ha desbloqueado
-            Cursor.visible = false; // Asegúrate de que el cursor permanezca invisible
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
-
-        // Rota la cámara en función del movimiento del ratón
+        // Rotate the camera
         yaw += speedH * Input.GetAxis("Mouse X");
 
-        // Actualiza la posición de la cámara en relación con el jugador
+        // Clampa el pitch para evitar vuelcos de la cámara
+        pitch = Mathf.Clamp(pitch, -89f, 89f);
+
+        // Rotate the camera around the player
         UpdateCameraPosition();
+        RotateCamera();
     }
+
+    void RotateCamera()
+    {
+        // Obtener la entrada horizontal para la rotación del jugador
+        float rotationInput = Input.GetAxis("Horizontal");
+
+        // Calcular el ángulo de rotación basado en la entrada y la velocidad de rotación
+        float rotationAngle = rotationInput * rotationSpeed * Time.deltaTime;
+
+        // Rotar el jugador
+        player.transform.rotation = Quaternion.Euler(0, yaw, 0);
+
+        // Rotar la cámara alrededor del jugador si es necesario (opcional)
+        // transform.RotateAround(player.transform.position, Vector3.up, rotationAngle);
+    }
+
+    /* void UpdateCameraPosition()
+    {
+        // Calcular la posición de la cámara usando coordenadas esféricas
+        Vector3 offset = new Vector3(0, 0.5f, -distance);
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+        transform.position = player.transform.position + rotation * offset;
+
+        // Asegurarse de que la cámara siempre mire hacia el jugador
+        transform.LookAt(player.transform.position);
+    } */
 
     void UpdateCameraPosition()
     {
