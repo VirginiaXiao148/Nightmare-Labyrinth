@@ -9,7 +9,7 @@ public class TextureChanger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Obtén el Renderer del prefab
+        // Obtain Renderer from prefab
         Renderer renderer = GetComponent<Renderer>();
 
         // Change the texture
