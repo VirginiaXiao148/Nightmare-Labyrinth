@@ -4,19 +4,16 @@ using UnityEngine;
 
 public class CameraController1 : MonoBehaviour
 {
-        public GameObject player; // Reference to the player GameObject
+    public GameObject player; // Reference to the player GameObject
 
-    public float distance = 0.5f; // Vector representing the distance between the camera and the player
-    public float minDistance = 0.2f; // Minimum distance from the player
-    public float maxDistance = 0.4f; // Maximum distance from the player
+    // El jugador que la cámara debe seguir
+    public Transform player;
 
-    public float rotationSpeed = 5f; // Speed at which the camera rotates
+    // Offset de la cámara desde el jugador
+    public Vector3 offset;
 
-    public float speedH = 2;
-    public float speedV = 2;
-
-    public float smoothTime = 0.1f; // Tiempo de suavizado para el movimiento de la cámara
-    private Vector3 velocity = Vector3.zero; // Velocidad utilizada para el suavizado
+    // Velocidad de seguimiento de la cámara
+    public float smoothSpeed = 0.125f;
 
     float yaw;
     float pitch;
@@ -32,6 +29,27 @@ public class CameraController1 : MonoBehaviour
         yaw = player.transform.eulerAngles.y;
         
         UpdateCameraPosition();
+    }
+
+    void FixedUpdate()
+    {
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        // Posición deseada de la cámara
+        Vector3 desiredPosition = player.position + offset;
+
+        // Interpolación suave entre la posición actual y la posición deseada
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+
+        // Asignar la posición suavizada a la cámara
+        transform.position = smoothedPosition;
+
+        // (Opcional) Asegurarse de que la cámara siempre mire al jugador
+        // transform.LookAt(player);
     }
 
     // LateUpdate is called after all Update functions have been called
