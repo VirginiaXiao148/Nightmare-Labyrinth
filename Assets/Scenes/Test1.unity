@@ -545,14 +545,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9789faf1aa2e4ce43a556afa9a14d208, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1034724582}
-  distance: 2
-  minDistance: 1
-  maxDistance: 3
-  rotationSpeed: 5
-  speedH: 2
-  speedV: 2
-  smoothTime: 0.1
+  player: {fileID: 1034724583}
+  offset: {x: 0, y: 0, z: 0}
+  smoothSpeed: 0.125
+  mouseSensitivity: 100
+  minYAngle: -30
+  maxYAngle: 60
 --- !u!81 &959016009
 AudioListener:
   m_ObjectHideFlags: 0
@@ -570,7 +568,7 @@ Transform:
   m_GameObject: {fileID: 959016006}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.053640895, y: 0.47604823, z: 0.04664202}
+  m_LocalPosition: {x: 6.708, y: 1.606, z: 3.177}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -594,7 +592,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1265453036353034789, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.279
+      value: 1.158
       objectReference: {fileID: 0}
     - target: {fileID: 1265453036353034789, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -628,6 +626,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1968034711160186978, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4091844253382449487, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
       propertyPath: healthBar
       value: 
@@ -645,9 +647,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
---- !u!1 &1034724582 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 66174508915401229, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
+--- !u!4 &1034724583 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1265453036353034789, guid: a3a2e59cf4459d54bae5be319beee3f8, type: 3}
   m_PrefabInstance: {fileID: 1034724581}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1312874593

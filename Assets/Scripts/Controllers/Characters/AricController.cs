@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class AricController : MonoBehaviour
 {
     public float rotationSpeed = 5f;
-    
+
     public int maxHealth = 100;
     public Image healthBar;
     public Text healthText;
@@ -15,7 +15,6 @@ public class AricController : MonoBehaviour
     private int currentHealth;
 
     public Camera mainCamera;
-    public Transform cameraTarget;
 
     private MazeGenerator mazeGenerator;
     private CharacterController controller;
@@ -70,10 +69,10 @@ public class AricController : MonoBehaviour
 
     private void HandleRotation()
     {
-        Vector3 direction = mainCamera.transform.position - transform.position;
+        Vector3 direction = mainCamera.transform.forward;
         direction.y = 0; // Mantener la dirección en el plano horizontal
         Quaternion rotation = Quaternion.LookRotation(direction);
-        transform.rotation = rotation;
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
     }
 
     private void HandleMovement()
