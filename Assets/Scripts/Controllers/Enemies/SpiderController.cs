@@ -41,8 +41,11 @@ public class SpiderController : MonoBehaviour
 
     private void Update()
     {
-        MoveTowardsPlayer();
-        CheckForPlayer();
+        if (!isStunned) // Evitar moverse o atacar si está aturdido
+        {
+            MoveTowardsPlayer();
+            CheckForPlayer();
+        }
     }
 
     private void MoveTowardsPlayer()
@@ -88,6 +91,7 @@ public class SpiderController : MonoBehaviour
                 Debug.Log("Player in sight and hit by raycast");
                 animation.Play("Attack");
                 player.GetComponent<AricController>().TakeDamage(attackDamage);
+                lastAttackTime = Time.time; // Actualizar el tiempo del último ataque
             }
         }
     }
