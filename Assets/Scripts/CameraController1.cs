@@ -24,15 +24,25 @@ public class CameraController1 : MonoBehaviour
     private float verticalRotation = 0f;
     private float horizontalRotation = 0f;
 
+    // Rotación objetivo acumulada
+    private Quaternion targetRotation;
+
     void Start()
     {
         // Bloquear el cursor en el centro de la pantalla
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        // Inicializar la rotación objetivo
+        targetRotation = transform.rotation;
     }
 
     void Update()
     {
+        if (Cursor.lockState != CursorLockMode.Locked){
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
         // Obtener la entrada del ratón
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -44,8 +54,8 @@ public class CameraController1 : MonoBehaviour
         verticalRotation -= mouseY;
         verticalRotation = Mathf.Clamp(verticalRotation, minYAngle, maxYAngle);
 
-        // Aplicar las rotaciones acumuladas a la cámara
-        transform.rotation = Quaternion.Euler(verticalRotation, horizontalRotation, 0f);
+        // Calcular la rotación objetivo acumulada
+        targetRotation = Quaternion.Euler(verticalRotation, horizontalRotation, 0f);
     }
 
     void LateUpdate()
@@ -53,11 +63,14 @@ public class CameraController1 : MonoBehaviour
         offset = new Vector3(0, 0.5f, 0.5f);
 
         // Calcular la posición deseada de la cámara
-        Vector3 desiredPosition = player.position + transform.rotation * offset;
+        Vector3 desiredPosition = player.position + targetRotation * offset;
 
         // Ajustar la posición de la cámara con una interpolación suave
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
         transform.position = smoothedPosition;
+
+        // Ajustar la rotación de la cámara con una interpolación suave
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, smoothSpeed);
 
         // Asegurarse de que la cámara siempre mire al jugador
         transform.LookAt(player.position + Vector3.up * offset.y);
@@ -67,7 +80,7 @@ public class CameraController1 : MonoBehaviour
         lookDirection.y = 0; // Mantener la dirección horizontal
         if (lookDirection != Vector3.zero)
         {
-            player.rotation = Quaternion.LookRotation(lookDirection);
+            player.rotation = Quaternion.Lerp(player.rotation, Quaternion.LookRotation(lookDirection), smoothSpeed);
         }
     }
 }
