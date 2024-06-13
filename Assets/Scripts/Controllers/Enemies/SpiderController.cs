@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SpiderController : MonoBehaviour
 {
-    public float moveSpeed = 0.5f;
+    public float moveSpeed = 0.3f;
     public float rotationSpeed = 5f;
     public float detectionRadius = 10f;
 
@@ -71,13 +71,14 @@ public class SpiderController : MonoBehaviour
             direction = Vector3.Lerp(direction, newDirection, rotationSpeed * Time.deltaTime).normalized;
         } */
 
-        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance))
         {
             Debug.Log("Hit: " + hit.collider.name);
             if (hit.collider.CompareTag("Wall"))
             {
                 Debug.Log("Wall detected by raycast");
-                // Si hay un obstáculo, buscar una nueva dirección
+
+                // Calcular nueva dirección para evitar el obstáculo
                 Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
                 direction = Vector3.Lerp(direction, newDirection, rotationSpeed * Time.deltaTime).normalized;
             }

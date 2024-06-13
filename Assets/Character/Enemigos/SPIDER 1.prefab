@@ -1809,7 +1809,7 @@ MonoBehaviour:
   obstacleAvoidanceDistance: 1
   obstacleLayerMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
 --- !u!54 &-6260813303710068011
 Rigidbody:
   m_ObjectHideFlags: 0
