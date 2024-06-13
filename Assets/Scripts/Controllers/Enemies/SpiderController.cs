@@ -64,13 +64,25 @@ public class SpiderController : MonoBehaviour
 
         // Detectar obstáculos
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+        /* if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
         {
             // Si hay un obstáculo, buscar una nueva dirección
             Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
             direction = Vector3.Lerp(direction, newDirection, rotationSpeed * Time.deltaTime).normalized;
-        }
+        } */
 
+        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+        {
+            Debug.Log("Hit: " + hit.collider.name);
+            if (hit.collider.CompareTag("Wall"))
+            {
+                Debug.Log("Wall detected by raycast");
+                // Si hay un obstáculo, buscar una nueva dirección
+                Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                direction = Vector3.Lerp(direction, newDirection, rotationSpeed * Time.deltaTime).normalized;
+            }
+        }
+            
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
         transform.position += transform.forward * moveSpeed * Time.deltaTime;

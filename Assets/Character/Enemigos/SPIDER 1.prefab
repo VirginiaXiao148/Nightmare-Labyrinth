@@ -1717,8 +1717,8 @@ GameObject:
   - component: {fileID: 6440129996965181589}
   - component: {fileID: 6440129996972178711}
   - component: {fileID: 8067208790625489002}
-  - component: {fileID: -6260813303710068011}
   - component: {fileID: -7660492969007768137}
+  - component: {fileID: -6260813303710068011}
   m_Layer: 0
   m_Name: SPIDER 1
   m_TagString: enemy
@@ -1785,6 +1785,31 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 7.6381364, y: 3.8224452, z: 6.6381583}
   m_Center: {x: 0.34215713, y: 1.4112227, z: -0.18613735}
+--- !u!114 &-7660492969007768137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6440129996965406069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae5d9cd1735c6064a8f66fcfd058cf6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 3
+  rotationSpeed: 5
+  detectionRadius: 10
+  attackRange: 1.5
+  attackDamage: 5
+  attackCooldown: 2
+  maxHealthSpider: 30
+  healthBar: {fileID: 2026635322269322937}
+  knockbackForce: 5
+  obstacleAvoidanceDistance: 1
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!54 &-6260813303710068011
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1808,34 +1833,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-7660492969007768137
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6440129996965406069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae5d9cd1735c6064a8f66fcfd058cf6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  maxHealthSpider: 30
-  healthBar: {fileID: 2026635322269322937}
-  attackRange: 1.5
-  attackDamage: 5
-  attackCooldown: 2
-  id: 
-  fieldOfViewAngle: 90
-  detectionRadius: 10
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!1 &6440129996965406071
 GameObject:
   m_ObjectHideFlags: 0
