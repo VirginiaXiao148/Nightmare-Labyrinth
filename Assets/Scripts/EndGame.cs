@@ -9,8 +9,8 @@ public class Portal : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Reiniciar la escena actual
-            SceneManager.LoadScene("Maze");
+            //SceneManager.LoadScene("Maze");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

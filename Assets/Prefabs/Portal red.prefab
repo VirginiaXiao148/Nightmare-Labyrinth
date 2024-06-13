@@ -14578,6 +14578,7 @@ GameObject:
   - component: {fileID: 6433945835423389772}
   - component: {fileID: 6088189790623085154}
   - component: {fileID: -4468040657145051461}
+  - component: {fileID: 6904381234524572367}
   m_Layer: 0
   m_Name: Portal red
   m_TagString: Untagged
@@ -19470,3 +19471,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3bfa91e320faa48bb0ddf3cbc2996b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &6904381234524572367
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7494077095689113452}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.8402, y: 2.841, z: 2.8402}
+  m_Center: {x: 0, y: 0.00050002337, z: 0}

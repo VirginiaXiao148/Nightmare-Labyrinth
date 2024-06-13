@@ -23,8 +23,11 @@ public class SpiderController : MonoBehaviour
     private Animation animation;
     private Rigidbody rb;
 
-    private bool isStunned = false; // Agregar esta línea
-    public float knockbackForce = 5f; // Agregar esta línea
+    private bool isStunned = false;
+    public float knockbackForce = 5f;
+
+    public float obstacleAvoidanceDistance = 2.0f;
+    public LayerMask obstacleLayerMask;
 
     private void Start()
     {
@@ -41,7 +44,7 @@ public class SpiderController : MonoBehaviour
 
     private void Update()
     {
-        if (!isStunned) // Evitar moverse o atacar si está aturdido
+        if (!isStunned)
         {
             MoveTowardsPlayer();
             CheckForPlayer();
@@ -50,9 +53,7 @@ public class SpiderController : MonoBehaviour
 
     private void MoveTowardsPlayer()
     {
-        if (player == null){
-            return;
-        }
+        if (player == null) return;
 
         if (!animation.IsPlaying("Walk"))
         {
@@ -60,6 +61,16 @@ public class SpiderController : MonoBehaviour
         }
 
         Vector3 direction = (player.position - transform.position).normalized;
+
+        // Detectar obstáculos
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+        {
+            // Si hay un obstáculo, buscar una nueva dirección
+            Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+            direction = Vector3.Lerp(direction, newDirection, rotationSpeed * Time.deltaTime).normalized;
+        }
+
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
@@ -67,8 +78,10 @@ public class SpiderController : MonoBehaviour
 
     private void CheckForPlayer()
     {
-        if (player == null){
+        if (player == null)
+        {
             SceneManager.LoadScene("EndGame");
+            return;
         }
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -91,7 +104,7 @@ public class SpiderController : MonoBehaviour
                 Debug.Log("Player in sight and hit by raycast");
                 animation.Play("Attack");
                 player.GetComponent<AricController>().TakeDamage(attackDamage);
-                lastAttackTime = Time.time; // Actualizar el tiempo del último ataque
+                lastAttackTime = Time.time;
             }
         }
     }
