@@ -23,10 +23,6 @@ public class SpiderController : MonoBehaviour
     private Animation animation;
     private Rigidbody rb;
 
-    public float patrolRange = 10f;
-    private Vector3 patrolPoint; 
-    private bool isPatrolling = false;
-
     private bool isStunned = false;
     public float knockbackForce = 5f;
 
@@ -48,32 +44,10 @@ public class SpiderController : MonoBehaviour
 
     private void Update()
     {
-        /* if (!isStunned)
+        if (!isStunned)
         {
             MoveTowardsPlayer();
             CheckForPlayer();
-        } */
-        if (!isStunned)
-        {
-            // Calcula la dirección hacia el jugador
-            Vector3 directionToPlayer = (player.position - transform.position).normalized;
-            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-            // Si el jugador está dentro del rango de detección y está en la dirección frontal, ataca
-            if (Vector3.Distance(transform.position, player.position) <= detectionRadius && angleToPlayer <= 60f)
-            {
-                MoveTowardsPlayer();
-
-                // Si el jugador está dentro del rango de ataque y ha pasado el cooldown
-                if (Vector3.Distance(transform.position, player.position) <= attackRange && Time.time > lastAttackTime + attackCooldown)
-                {
-                    AttackPlayer();
-                }
-            }
-            else
-            {
-                // Llama al método de patrullaje si el jugador no está en rango
-                Patrolling();
-            }
         }
     }
 
@@ -205,74 +179,6 @@ public class SpiderController : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         gameObject.SetActive(false);
-    }
-
-    private void Patrolling()
-    {
-        // Si no está patrullando, elige un nuevo punto de patrullaje aleatorio
-        if (!isPatrolling)
-        {
-            isPatrolling = true;
-            StartCoroutine(ChoosePatrolPoint());
-        }
-
-        // Mueve hacia el punto de patrullaje actual si no hay obstáculos en el camino
-        if (!animation.IsPlaying("Walk"))
-        {
-            PlayWalkAnimation();
-        }
-
-        Vector3 direction = (patrolPoint - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-
-        // Calcula la posición objetivo hacia la cual moverse
-        Vector3 targetPosition = transform.position + transform.forward * moveSpeed * Time.deltaTime;
-
-        // Verifica si hay un obstáculo en la posición objetivo
-        Collider[] hitColliders = Physics.OverlapSphere(targetPosition, 0.5f); // Ajusta el radio según el tamaño del demonio
-
-        bool obstacleDetected = false;
-        foreach (Collider collider in hitColliders)
-        {
-            // Verifica si hay colisión con alguna pared u obstáculo
-            if (collider.CompareTag("Wall"))
-            {
-                obstacleDetected = true;
-                break;
-            }
-        }
-
-        // Si no hay obstáculos, mueve al demonio
-        if (!obstacleDetected)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-            transform.position = targetPosition;
-        }
-        else
-        {
-            // Hay un obstáculo, elige un nuevo punto de patrullaje
-            isPatrolling = false;
-        }
-
-        // Si el demonio llega al punto de patrullaje actual, elige un nuevo punto
-        if (Vector3.Distance(transform.position, patrolPoint) <= 0.1f)
-        {
-            isPatrolling = false;
-        }
-    }
-
-    private IEnumerator ChoosePatrolPoint()
-    {
-        // Elige un nuevo punto de patrullaje aleatorio dentro del rango especificado
-        float randomX = Random.Range(-patrolRange, patrolRange);
-        float randomZ = Random.Range(-patrolRange, patrolRange);
-        patrolPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-        // Espera un tiempo aleatorio antes de elegir el siguiente punto de patrullaje
-        float waitTime = Random.Range(3f, 8f);
-        yield return new WaitForSeconds(waitTime);
-
-        isPatrolling = false;
     }
 
     public void PlayWalkAnimation()
