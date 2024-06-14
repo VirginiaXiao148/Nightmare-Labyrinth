@@ -228,29 +228,31 @@ public class SpiderController : MonoBehaviour
         // Calcula la posición objetivo hacia la cual moverse
         Vector3 targetPosition = transform.position + transform.forward * moveSpeed * Time.deltaTime;
 
-        // Verifica si hay un obstáculo en la posición objetivo usando Raycast
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
-        {
-            Debug.Log("Hit: " + hit.collider.name);
-            if (hit.collider.CompareTag("Wall"))
-            {
-                Debug.Log("Wall detected by raycast");
+        // Verifica si hay un obstáculo en la posición objetivo
+        Collider[] hitColliders = Physics.OverlapSphere(targetPosition, 0.5f); // Ajusta el radio según el tamaño del demonio
 
-                // Calcular nueva dirección para evitar el obstáculo
-                Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
-                // Asegurar que la dirección no sea cero
-                if (newDirection != Vector3.zero)
-                {
-                    direction = newDirection;
-                    lookRotation = Quaternion.LookRotation(direction);
-                }
+        bool obstacleDetected = false;
+        foreach (Collider collider in hitColliders)
+        {
+            // Verifica si hay colisión con alguna pared u obstáculo
+            if (collider.CompareTag("Wall"))
+            {
+                obstacleDetected = true;
+                break;
             }
         }
 
-        // Mueve al demonio hacia la dirección ajustada
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        // Si no hay obstáculos, mueve al demonio
+        if (!obstacleDetected)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+            transform.position = targetPosition;
+        }
+        else
+        {
+            // Hay un obstáculo, elige un nuevo punto de patrullaje
+            isPatrolling = false;
+        }
 
         // Si el demonio llega al punto de patrullaje actual, elige un nuevo punto
         if (Vector3.Distance(transform.position, patrolPoint) <= 0.1f)
@@ -258,7 +260,6 @@ public class SpiderController : MonoBehaviour
             isPatrolling = false;
         }
     }
-
 
     private IEnumerator ChoosePatrolPoint()
     {
