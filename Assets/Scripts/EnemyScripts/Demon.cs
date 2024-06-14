@@ -21,6 +21,11 @@ public class DemonController : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
 
+    public float patrolRange = 10f; // Rango máximo en el que el demonio patrullará
+    private Vector3 patrolPoint;   // Punto de patrullaje actual
+    private bool isPatrolling = false; // Indica si el demonio está patrullando
+
+
     private bool isStunned = false;
     public float knockbackForce = 5f;
 
@@ -52,7 +57,7 @@ public class DemonController : MonoBehaviour
         lastAttackTime = -attackCooldown;
     }
 
-    private void Update()
+    /* private void Update()
     {
         if (player == null)
         {
@@ -65,6 +70,37 @@ public class DemonController : MonoBehaviour
         if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
         {
             AttackPlayer();
+        }
+    } */
+
+    private void Update()
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        if (!isStunned)
+        {
+            // Calcula la dirección hacia el jugador
+            Vector3 directionToPlayer = (player.position - transform.position).normalized;
+            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+            // Si el jugador está dentro del rango de detección y está en la dirección frontal, ataca
+            if (Vector3.Distance(transform.position, player.position) <= detectionRadius && angleToPlayer <= 60f)
+            {
+                MoveTowardsPlayer();
+
+                // Si el jugador está dentro del rango de ataque y ha pasado el cooldown
+                if (Vector3.Distance(transform.position, player.position) <= attackRange && Time.time > lastAttackTime + attackCooldown)
+                {
+                    AttackPlayer();
+                }
+            }
+            else
+            {
+                // Llama al método de patrullaje si el jugador no está en rango
+                Patrolling();
+            }
         }
     }
 
@@ -132,4 +168,68 @@ public class DemonController : MonoBehaviour
         animator.SetBool("Dead", true);
         gameObject.SetActive(false);
     }
+
+    private void Patrolling()
+    {
+        // Si no está patrullando, elige un nuevo punto de patrullaje aleatorio
+        if (!isPatrolling)
+        {
+            isPatrolling = true;
+            StartCoroutine(ChoosePatrolPoint());
+        }
+
+        // Mueve hacia el punto de patrullaje actual si no hay obstáculos en el camino
+        animator.SetBool("Walking", true);
+
+        Vector3 direction = (patrolPoint - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+        // Calcula la posición objetivo hacia la cual moverse
+        Vector3 targetPosition = transform.position + transform.forward * moveSpeed * Time.deltaTime;
+
+        // Verifica si hay un obstáculo en la posición objetivo usando Raycast
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+        {
+            Debug.Log("Hit: " + hit.collider.name);
+            if (hit.collider.CompareTag("Wall"))
+            {
+                Debug.Log("Wall detected by raycast");
+
+                // Calcular nueva dirección para evitar el obstáculo
+                Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                // Asegurar que la dirección no sea cero
+                if (newDirection != Vector3.zero)
+                {
+                    direction = newDirection;
+                    lookRotation = Quaternion.LookRotation(direction);
+                }
+            }
+        }
+
+        // Mueve al demonio hacia la dirección ajustada
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+
+        // Si el demonio llega al punto de patrullaje actual, elige un nuevo punto
+        if (Vector3.Distance(transform.position, patrolPoint) <= 0.1f)
+        {
+            isPatrolling = false;
+        }
+    }
+
+    private IEnumerator ChoosePatrolPoint()
+    {
+        // Elige un nuevo punto de patrullaje aleatorio dentro del rango especificado
+        float randomX = Random.Range(-patrolRange, patrolRange);
+        float randomZ = Random.Range(-patrolRange, patrolRange);
+        patrolPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+
+        // Espera un tiempo aleatorio antes de elegir el siguiente punto de patrullaje
+        float waitTime = Random.Range(3f, 8f);
+        yield return new WaitForSeconds(waitTime);
+
+        isPatrolling = false;
+    }
+
 }
