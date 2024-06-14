@@ -51,61 +51,51 @@ public class SpiderController : MonoBehaviour
         }
     }
 
-    /* private void MoveTowardsPlayer()
+    private void MoveTowardsPlayer()
+{
+    if (isStunned)
     {
-        if (player == null) return;
+        return;
+    }
 
-        if (!animation.IsPlaying("Walk"))
+    // Establecer el parámetro de animación para caminar
+    if (!animation.IsPlaying("Walk"))
         {
             PlayWalkAnimation();
         }
 
-        Vector3 direction = (player.position - transform.position).normalized;
+    Vector3 direction = (player.position - transform.position).normalized;
+    Vector3[] raycastDirections = new Vector3[]
+    {
+        transform.forward,
+        transform.forward + transform.right,
+        transform.forward - transform.right
+        // Añade más direcciones según sea necesario para tu araña
+    };
 
-        // Detectar obstáculos
+    foreach (Vector3 raycastDir in raycastDirections)
+    {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleAvoidanceDistance))
+        if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
         {
-            Debug.Log("Hit: " + hit.collider.name);
             if (hit.collider.CompareTag("Wall"))
             {
-                Debug.Log("Wall detected by raycast");
-
                 // Calcular nueva dirección para evitar el obstáculo
                 Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
-                // Asegurar que la dirección no sea cero
                 if (newDirection != Vector3.zero)
                 {
                     direction = newDirection;
+                    break; // Salir del bucle si se encontró una dirección válida
                 }
-
-                // Aplicar una pequeña fuerza para alejarse de la pared
-                rb.AddForce(-hit.normal * knockbackForce, ForceMode.Impulse);
             }
         }
-
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
-    } */
-
-    private void MoveTowardsPlayer()
-    {
-        if (isStunned)
-        {
-            return;
-        }
-
-        if (!animation.IsPlaying("Walk"))
-        {
-            PlayWalkAnimation();
-        }
-
-        Vector3 direction = (player.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
+
+    Quaternion lookRotation = Quaternion.LookRotation(direction);
+    transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+    transform.position += transform.forward * moveSpeed * Time.deltaTime;
+}
+
 
     private void CheckForPlayer()
     {
