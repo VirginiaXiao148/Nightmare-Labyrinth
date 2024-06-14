@@ -76,7 +76,7 @@ public class SpiderController : MonoBehaviour
     foreach (Vector3 raycastDir in raycastDirections)
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+        if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
         {
             if (hit.collider.CompareTag("Wall"))
             {

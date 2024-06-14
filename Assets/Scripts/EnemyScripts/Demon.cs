@@ -24,6 +24,8 @@ public class DemonController : MonoBehaviour
     private bool isStunned = false;
     public float knockbackForce = 5f;
 
+    public float obstacleAvoidanceDistance = 2.0f;
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -90,7 +92,7 @@ public class DemonController : MonoBehaviour
         foreach (Vector3 raycastDir in raycastDirections)
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
