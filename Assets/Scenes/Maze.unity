@@ -419,7 +419,6 @@ MonoBehaviour:
   mouseSensitivity: 100
   minYAngle: -30
   maxYAngle: 60
-  minDistance: 0.5
 --- !u!1 &478669396
 GameObject:
   m_ObjectHideFlags: 0

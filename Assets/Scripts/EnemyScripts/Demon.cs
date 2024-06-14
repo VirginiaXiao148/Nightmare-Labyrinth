@@ -9,12 +9,12 @@ public class DemonController : MonoBehaviour
     private float currentHealth;
     public HealthBar healthBar;
 
-    public float moveSpeed = 0.5f;
+    public float moveSpeed = 0.3f;
     public float rotationSpeed = 5f;
     public float detectionRadius = 10f;
     public float attackRange = 1.5f;
     public int attackDamage = 20;
-    public float attackCooldown = 1.5f;
+    public float attackCooldown = 3f;
     private float lastAttackTime;
 
     private Transform player;
