@@ -126,6 +126,30 @@ public class DemonController : MonoBehaviour
         lastAttackTime = Time.time;
     }
 
+    private void AttackPlayer()
+    {
+        if (isStunned || player == null)
+        {
+            return;
+        }
+
+        Debug.Log("Player detected! Attacking...");
+        Vector3 directionToPlayer = player.position - transform.position;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
+        {
+            Debug.Log("Hit: " + hit.collider.name);
+            if (hit.collider.CompareTag("Player"))
+            {
+                Debug.Log("Player in sight and hit by raycast");
+                animator.SetBool("Walking", false);
+                animator.SetBool("Punching1", true);
+                player.GetComponent<AricController>().TakeDamage(attackDamage);
+                lastAttackTime = Time.time;
+            }
+        }
+    }
+
     public void TakeDamage(float damage)
     {
         animator.SetBool("Stunned", true);

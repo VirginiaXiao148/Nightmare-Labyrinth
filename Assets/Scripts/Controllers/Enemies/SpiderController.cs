@@ -114,6 +114,13 @@ public class SpiderController : MonoBehaviour
 
     private void AttackPlayer()
     {
+        if (isStunned || player == null)
+        {
+            return;
+        }
+
+        GetComponent<Animation>().Stop();
+
         Debug.Log("Player detected! Attacking...");
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
