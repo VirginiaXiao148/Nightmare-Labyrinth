@@ -120,20 +120,6 @@ public class DemonController : MonoBehaviour
         }
 
         Debug.Log("Player detected! Attacking...");
-        animator.SetBool("Walking", false);
-        animator.SetBool("Punching1", true);
-        player.GetComponent<AricController>().TakeDamage(attackDamage);
-        lastAttackTime = Time.time;
-    }
-
-    private void AttackPlayer()
-    {
-        if (isStunned || player == null)
-        {
-            return;
-        }
-
-        Debug.Log("Player detected! Attacking...");
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
         if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
