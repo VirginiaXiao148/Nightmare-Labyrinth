@@ -1801,12 +1801,18 @@ MonoBehaviour:
   moveSpeed: 3
   rotationSpeed: 5
   detectionRadius: 10
+  fieldOfViewAngle: 90
+  maxSightDistance: 10
   attackRange: 1.5
   attackDamage: 5
   attackCooldown: 2
   maxHealthSpider: 30
   healthBar: {fileID: 2026635322269322937}
   knockbackForce: 5
+  obstacleAvoidanceDistance: 2
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!54 &-6260813303710068011
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1841,7 +1847,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6440129996965406069}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5

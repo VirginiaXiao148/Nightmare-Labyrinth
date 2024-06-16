@@ -8,13 +8,15 @@ public class SpiderController : MonoBehaviour
     public float moveSpeed = 0.3f;
     public float rotationSpeed = 5f;
     public float detectionRadius = 10f;
+    public float fieldOfViewAngle = 90f;
+    public float maxSightDistance = 10f;
 
     public float attackRange = 1.5f;
     public int attackDamage = 5;
     public float attackCooldown = 2f;
     private float lastAttackTime;
 
-    public float maxHealthSpider = 30;
+    public float maxHealthSpider = 30f;
     private float currentHealth;
     public HealthBar healthBar;
 
@@ -25,6 +27,10 @@ public class SpiderController : MonoBehaviour
 
     private bool isStunned = false;
     public float knockbackForce = 5f;
+
+    private float changeDirectionInterval = 2f;
+    private float timer;
+    private Vector3 moveDirection;
 
     public float obstacleAvoidanceDistance = 2.0f;
     public LayerMask obstacleLayerMask;
@@ -40,24 +46,94 @@ public class SpiderController : MonoBehaviour
 
         currentHealth = maxHealthSpider;
         healthBar.SetHealth(currentHealth, maxHealthSpider);
+
+        moveDirection = Vector3.forward;
     }
 
     private void Update()
     {
         if (!isStunned)
         {
-            MoveTowardsPlayer();
-            CheckForPlayer();
+            timer += Time.deltaTime;
+
+            if (timer >= changeDirectionInterval)
+            {
+                ChangeDirection();
+                timer = 0f;
+            }
+
+            if (IsPlayerInSight())
+            {
+                float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+                {
+                    AttackPlayer();
+                }
+                else if (distanceToPlayer > attackRange)
+                {
+                    MoveTowardsPlayer();
+                }
+            }
+            else
+            {
+                MoveInDirection();
+            }
         }
+    }
+
+    private bool IsPlayerInSight()
+    {
+        Vector3 directionToPlayer = player.position - transform.position;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if (angleToPlayer < fieldOfViewAngle / 2f)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, directionToPlayer, out hit, maxSightDistance))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void ChangeDirection()
+    {
+        if (!animation.IsPlaying("Walk"))
+        {
+            PlayWalkAnimation();
+        }
+
+        bool foundValidDirection = false;
+        Vector3 randomDirection = Vector3.zero;
+
+        while (!foundValidDirection)
+        {
+            float randomX = Random.Range(-1f, 1f);
+            float randomZ = Random.Range(-1f, 1f);
+            randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
+
+            if (!IsBlocked(randomDirection))
+            {
+                foundValidDirection = true;
+            }
+        }
+
+        moveDirection = randomDirection;
+        transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+    }
+
+    private void MoveInDirection()
+    {
+        Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
+        rb.MovePosition(newPosition);
     }
 
     private void MoveTowardsPlayer()
     {
-        if (isStunned)
-        {
-            return;
-        }
-
         if (!animation.IsPlaying("Walk"))
         {
             PlayWalkAnimation();
@@ -74,7 +150,7 @@ public class SpiderController : MonoBehaviour
         foreach (Vector3 raycastDir in raycastDirections)
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
@@ -91,48 +167,21 @@ public class SpiderController : MonoBehaviour
 
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
-    }
-
-    private void CheckForPlayer()
-    {
-        if (player == null)
-        {
-            SceneManager.LoadScene("EndGame");
-            return;
-        }
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
-        {
-            AttackPlayer();
-        }
+        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
     }
 
     private void AttackPlayer()
     {
-        Debug.Log("Player detected! Attacking...");
-        Vector3 directionToPlayer = player.position - transform.position;
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
-        {
-            Debug.Log("Hit: " + hit.collider.name);
-            if (hit.collider.CompareTag("Player"))
-            {
-                Debug.Log("Player in sight and hit by raycast");
-                animation.Play("Attack");
-                player.GetComponent<AricController>().TakeDamage(attackDamage);
-                lastAttackTime = Time.time;
-            }
-        }
+        animation.Play("Attack");
+        player.GetComponent<AricController>().TakeDamage(attackDamage);
+        lastAttackTime = Time.time;
     }
 
     public void TakeDamage(float damage)
     {
-        GetComponent<Animation>().Stop();
+        animation.Stop();
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth, maxHealthSpider);
-        Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
 
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
@@ -155,9 +204,8 @@ public class SpiderController : MonoBehaviour
         isStunned = false;
     }
 
-    void Die()
+    private void Die()
     {
-        Debug.Log("Enemy died!");
         animation.Play("Death");
         StartCoroutine(DisableAfterAnimation(animation["Death"].length));
     }
@@ -181,5 +229,10 @@ public class SpiderController : MonoBehaviour
     public void PlayIdleAnimation()
     {
         animation.Play("Idle");
+    }
+
+    private bool IsBlocked(Vector3 direction)
+    {
+        return Physics.Raycast(transform.position, direction, obstacleAvoidanceDistance, obstacleLayerMask);
     }
 }

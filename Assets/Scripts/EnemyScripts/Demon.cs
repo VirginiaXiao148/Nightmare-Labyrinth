@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class DemonController : MonoBehaviour
 {
-    public float maxHealth = 50;
+    public float maxHealth = 50f;
     private float currentHealth;
     public HealthBar healthBar;
 
@@ -18,6 +17,7 @@ public class DemonController : MonoBehaviour
     private float lastAttackTime;
 
     public float obstacleAvoidanceDistance = 2.0f;
+    public LayerMask obstacleLayerMask;
 
     private Transform player;
     private Animator animator;
@@ -25,6 +25,10 @@ public class DemonController : MonoBehaviour
 
     private bool isStunned = false;
     public float knockbackForce = 5f;
+
+    private float timer;
+    public float changeDirectionInterval = 2f;
+    private Vector3 moveDirection;
 
     private void Start()
     {
@@ -52,6 +56,8 @@ public class DemonController : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.SetHealth(currentHealth, maxHealth);
         lastAttackTime = -attackCooldown;
+
+        moveDirection = Vector3.forward;
     }
 
     private void Update()
@@ -61,13 +67,84 @@ public class DemonController : MonoBehaviour
             return;
         }
 
-        MoveTowardsPlayer();
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+        if (!isStunned)
         {
-            AttackPlayer();
+            timer += Time.deltaTime;
+
+            if (timer >= changeDirectionInterval)
+            {
+                ChangeDirection();
+                timer = 0f;
+            }
+
+            if (IsPlayerInSight())
+            {
+                float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+                {
+                    AttackPlayer();
+                }
+                else if (distanceToPlayer > attackRange)
+                {
+                    MoveTowardsPlayer();
+                }
+            }
+            else
+            {
+                MoveInDirection();
+            }
         }
+    }
+
+    private bool IsPlayerInSight()
+    {
+        Vector3 directionToPlayer = player.position - transform.position;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if (angleToPlayer < 60f) // Assuming a field of view angle of 120 degrees divided by 2
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void ChangeDirection()
+    {
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Walking"))
+        {
+            animator.SetBool("Walking", true);
+        }
+
+        bool foundValidDirection = false;
+        Vector3 randomDirection = Vector3.zero;
+
+        while (!foundValidDirection)
+        {
+            float randomX = Random.Range(-1f, 1f);
+            float randomZ = Random.Range(-1f, 1f);
+            randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
+
+            if (!IsBlocked(randomDirection))
+            {
+                foundValidDirection = true;
+            }
+        }
+
+        moveDirection = randomDirection;
+        transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+    }
+
+    private void MoveInDirection()
+    {
+        Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
+        rb.MovePosition(newPosition);
     }
 
     private void MoveTowardsPlayer()
@@ -77,8 +154,10 @@ public class DemonController : MonoBehaviour
             return;
         }
 
-        // Establecer el parámetro de animación para caminar
-        animator.SetBool("Walking", true);
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Walking"))
+        {
+            animator.SetBool("Walking", true);
+        }
 
         Vector3 direction = (player.position - transform.position).normalized;
         Vector3[] raycastDirections = new Vector3[]
@@ -91,7 +170,7 @@ public class DemonController : MonoBehaviour
         foreach (Vector3 raycastDir in raycastDirections)
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
@@ -108,7 +187,7 @@ public class DemonController : MonoBehaviour
 
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
     }
 
     private void AttackPlayer()
@@ -118,17 +197,15 @@ public class DemonController : MonoBehaviour
             return;
         }
 
-        Debug.Log("Player detected! Attacking...");
+        animator.SetBool("Walking", false);
+        animator.SetBool("Punching1", true);
+
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
         if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
         {
-            Debug.Log("Hit: " + hit.collider.name);
             if (hit.collider.CompareTag("Player"))
             {
-                Debug.Log("Player in sight and hit by raycast");
-                animator.SetBool("Walking", false);
-                animator.SetBool("Punching1", true);
                 player.GetComponent<AricController>().TakeDamage(attackDamage);
                 lastAttackTime = Time.time;
             }
@@ -140,7 +217,6 @@ public class DemonController : MonoBehaviour
         animator.SetBool("Stunned", true);
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth, maxHealth);
-        Debug.Log("Demon takes " + damage + " damage, health is now " + currentHealth);
 
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
@@ -166,8 +242,12 @@ public class DemonController : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("Demon died!");
         animator.SetBool("Dead", true);
-        gameObject.SetActive(false);
+        Destroy(gameObject, 2f);
+    }
+
+    private bool IsBlocked(Vector3 direction)
+    {
+        return Physics.Raycast(transform.position, direction, obstacleAvoidanceDistance, obstacleLayerMask);
     }
 }
