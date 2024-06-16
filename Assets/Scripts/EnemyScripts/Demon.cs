@@ -86,7 +86,6 @@ public class DemonController : MonoBehaviour
             transform.forward,
             transform.forward + transform.right,
             transform.forward - transform.right
-            // Añade más direcciones según sea necesario para tu araña
         };
 
         foreach (Vector3 raycastDir in raycastDirections)
@@ -109,7 +108,8 @@ public class DemonController : MonoBehaviour
 
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        //transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
     }
 
     private void AttackPlayer()

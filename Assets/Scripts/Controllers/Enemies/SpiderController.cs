@@ -52,49 +52,49 @@ public class SpiderController : MonoBehaviour
     }
 
     private void MoveTowardsPlayer()
-{
-    if (isStunned)
     {
-        return;
-    }
-
-    // Establecer el parámetro de animación para caminar
-    if (!animation.IsPlaying("Walk"))
+        if (isStunned)
         {
-            PlayWalkAnimation();
+            return;
         }
 
-    Vector3 direction = (player.position - transform.position).normalized;
-    Vector3[] raycastDirections = new Vector3[]
-    {
-        transform.forward,
-        transform.forward + transform.right,
-        transform.forward - transform.right
-        // Añade más direcciones según sea necesario para tu araña
-    };
-
-    foreach (Vector3 raycastDir in raycastDirections)
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
-        {
-            if (hit.collider.CompareTag("Wall"))
+        // Establecer el parámetro de animación para caminar
+        if (!animation.IsPlaying("Walk"))
             {
-                // Calcular nueva dirección para evitar el obstáculo
-                Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
-                if (newDirection != Vector3.zero)
+                PlayWalkAnimation();
+            }
+
+        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3[] raycastDirections = new Vector3[]
+        {
+            transform.forward,
+            transform.forward + transform.right,
+            transform.forward - transform.right
+        };
+
+        foreach (Vector3 raycastDir in raycastDirections)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
+            {
+                if (hit.collider.CompareTag("Wall"))
                 {
-                    direction = newDirection;
-                    break; // Salir del bucle si se encontró una dirección válida
+                    // Calcular nueva dirección para evitar el obstáculo
+                    Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                    if (newDirection != Vector3.zero)
+                    {
+                        direction = newDirection;
+                        break; // Salir del bucle si se encontró una dirección válida
+                    }
                 }
             }
         }
-    }
 
-    Quaternion lookRotation = Quaternion.LookRotation(direction);
-    transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-    transform.position += transform.forward * moveSpeed * Time.deltaTime;
-}
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+        //transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
+    }
 
 
     private void CheckForPlayer()
