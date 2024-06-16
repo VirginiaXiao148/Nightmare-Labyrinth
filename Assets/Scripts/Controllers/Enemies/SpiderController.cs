@@ -1,11 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.AI;
 
 public class SpiderController : MonoBehaviour
 {
-    public float moveSpeed = 0.5f;
+    public float moveSpeed = 0.3f;
     public float rotationSpeed = 5f;
     public float detectionRadius = 10f;
 
@@ -22,48 +22,28 @@ public class SpiderController : MonoBehaviour
 
     private Animation animation;
     private Rigidbody rb;
-    private NavMeshAgent navMeshAgent;
 
     private bool isStunned = false;
     public float knockbackForce = 5f;
+
+    public float obstacleAvoidanceDistance = 2.0f;
+    public LayerMask obstacleLayerMask;
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animation = GetComponent<Animation>();
         rb = GetComponent<Rigidbody>();
-        navMeshAgent = GetComponent<NavMeshAgent>();
-
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         currentHealth = maxHealthSpider;
         healthBar.SetHealth(currentHealth, maxHealthSpider);
-
-        navMeshAgent.speed = moveSpeed;
-        navMeshAgent.stoppingDistance = attackRange;
-
-        // Ajustar la posición del agente a la NavMesh
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(transform.position, out hit, 1.0f, NavMesh.AllAreas))
-        {
-            navMeshAgent.Warp(hit.position);
-        }
-        else
-        {
-            Debug.LogError("Spider not placed on a valid NavMesh position.");
-            return;
-        }
     }
 
     private void Update()
     {
-        if (player == null || !navMeshAgent.isOnNavMesh)
-        {
-            return;
-        }
-
         if (!isStunned)
         {
             MoveTowardsPlayer();
@@ -73,17 +53,45 @@ public class SpiderController : MonoBehaviour
 
     private void MoveTowardsPlayer()
     {
-        if (player == null) return;
+        if (isStunned)
+        {
+            return;
+        }
 
         if (!animation.IsPlaying("Walk"))
         {
             PlayWalkAnimation();
         }
 
-        if (navMeshAgent.isOnNavMesh)
+        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3[] raycastDirections = new Vector3[]
         {
-            navMeshAgent.SetDestination(player.position);
+            transform.forward,
+            transform.forward + transform.right,
+            transform.forward - transform.right
+        };
+
+        foreach (Vector3 raycastDir in raycastDirections)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
+            {
+                if (hit.collider.CompareTag("Wall"))
+                {
+                    // Calcular nueva dirección para evitar el obstáculo
+                    Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                    if (newDirection != Vector3.zero)
+                    {
+                        direction = newDirection;
+                        break; // Salir del bucle si se encontró una dirección válida
+                    }
+                }
+            }
         }
+
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+        transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
     private void CheckForPlayer()
@@ -121,7 +129,7 @@ public class SpiderController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        animation.Stop();
+        GetComponent<Animation>().Stop();
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth, maxHealthSpider);
         Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
@@ -143,16 +151,8 @@ public class SpiderController : MonoBehaviour
     private IEnumerator StunEnemy(float duration)
     {
         isStunned = true;
-        if (navMeshAgent.isOnNavMesh)
-        {
-            navMeshAgent.isStopped = true;
-        }
         yield return new WaitForSeconds(duration);
         isStunned = false;
-        if (navMeshAgent.isOnNavMesh)
-        {
-            navMeshAgent.isStopped = false;
-        }
     }
 
     void Die()
