@@ -123,13 +123,13 @@ public class SpiderController : MonoBehaviour
         }
 
         moveDirection = randomDirection;
+        rb.MovePosition(transform.position + moveDirection * moveSpeed * Time.deltaTime);
         transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
     }
 
     private void MoveInDirection()
     {
-        Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
-        rb.MovePosition(newPosition);
+        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
     }
 
     private void MoveTowardsPlayer()

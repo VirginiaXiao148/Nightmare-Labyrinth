@@ -138,13 +138,13 @@ public class DemonController : MonoBehaviour
         }
 
         moveDirection = randomDirection;
+        rb.MovePosition(transform.position + moveDirection * moveSpeed * Time.deltaTime);
         transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
     }
 
     private void MoveInDirection()
     {
-        Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
-        rb.MovePosition(newPosition);
+        rb.MovePosition(transform.position + moveDirection * moveSpeed * Time.deltaTime);
     }
 
     private void MoveTowardsPlayer()
@@ -174,12 +174,12 @@ public class DemonController : MonoBehaviour
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
-                    // Calcular nueva dirección para evitar el obstáculo
+                    // Calculate new direction to avoid obstacle
                     Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
                     if (newDirection != Vector3.zero)
                     {
                         direction = newDirection;
-                        break; // Salir del bucle si se encontró una dirección válida
+                        break; // Exit loop if valid direction found
                     }
                 }
             }
