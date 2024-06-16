@@ -507,7 +507,6 @@ GameObject:
   - component: {fileID: 7734789708898231637}
   - component: {fileID: 9057890878186894447}
   - component: {fileID: 6599599599255534779}
-  - component: {fileID: 3733120266458006519}
   m_Layer: 0
   m_Name: MazeCellVer2
   m_TagString: Ground
@@ -601,7 +600,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
@@ -660,32 +659,3 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 35ca2a169309a5648b4f73b4cee093cc, type: 3}
   - {fileID: 2800000, guid: 6933b8ed65339784c831f6449599d00c, type: 3}
   - {fileID: 2800000, guid: 1d2fe280e8f80b24a8aab2d1100f5b74, type: 3}
---- !u!114 &3733120266458006519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4343478489080307292}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb796a9ac0eff6647b1e025bf3982758, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AgentTypeID: 0
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
-  m_DefaultArea: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 23d89b59f691bb240a4d0755ecb3f3e6, type: 2}

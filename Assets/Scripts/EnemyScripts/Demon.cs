@@ -91,7 +91,11 @@ public class DemonController : MonoBehaviour
             }
             else
             {
-                MoveInDirection();
+                if (timer >= changeDirectionInterval)
+                {
+                    ChangeDirection();
+                    timer = 0f;
+                }
             }
         }
     }
@@ -123,6 +127,7 @@ public class DemonController : MonoBehaviour
         }
         
         Vector3 randomDirection = Vector3.zero;
+        bool foundValidDirection = false;
         Vector3[] raycastDirections = new Vector3[]
         {
             transform.forward,
@@ -137,15 +142,22 @@ public class DemonController : MonoBehaviour
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
-                    // Calcular nueva dirección para evitar el obstáculo
+                    // Calculate new direction to avoid the obstacle
                     Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
                     if (newDirection != Vector3.zero)
                     {
                         randomDirection = newDirection;
-                        break; // Salir del bucle si se encontró una dirección válida
+                        foundValidDirection = true;
+                        break; // Exit the loop if a valid direction is found
                     }
                 }
             }
+        }
+
+        if (!foundValidDirection)
+        {
+            // If no valid direction was found via raycasting, choose a random direction
+            randomDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
         }
 
         moveDirection = randomDirection;
