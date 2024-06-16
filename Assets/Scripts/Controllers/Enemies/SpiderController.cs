@@ -107,18 +107,29 @@ public class SpiderController : MonoBehaviour
             PlayWalkAnimation();
         }
 
-        bool foundValidDirection = false;
         Vector3 randomDirection = Vector3.zero;
-
-        while (!foundValidDirection)
+        Vector3[] raycastDirections = new Vector3[]
         {
-            float randomX = Random.Range(-1f, 1f);
-            float randomZ = Random.Range(-1f, 1f);
-            randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
+            transform.forward,
+            transform.forward + transform.right,
+            transform.forward - transform.right
+        };
 
-            if (!IsBlocked(randomDirection))
+        foreach (Vector3 raycastDir in raycastDirections)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance, obstacleLayerMask))
             {
-                foundValidDirection = true;
+                if (hit.collider.CompareTag("Wall"))
+                {
+                    // Calcular nueva dirección para evitar el obstáculo
+                    Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                    if (newDirection != Vector3.zero)
+                    {
+                        randomDirection = newDirection;
+                        break; // Salir del bucle si se encontró una dirección válida
+                    }
+                }
             }
         }
 
