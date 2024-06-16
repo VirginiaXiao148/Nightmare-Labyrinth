@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class DemonController : MonoBehaviour
@@ -9,8 +9,6 @@ public class DemonController : MonoBehaviour
     private float currentHealth;
     public HealthBar healthBar;
 
-    public float moveSpeed = 0.3f;
-    public float rotationSpeed = 5f;
     public float detectionRadius = 10f;
     public float attackRange = 1.5f;
     public int attackDamage = 20;
@@ -19,12 +17,10 @@ public class DemonController : MonoBehaviour
 
     private Transform player;
     private Animator animator;
-    private Rigidbody rb;
+    private NavMeshAgent agent;
 
     private bool isStunned = false;
     public float knockbackForce = 5f;
-
-    public float obstacleAvoidanceDistance = 2.0f;
 
     private void Start()
     {
@@ -37,21 +33,29 @@ public class DemonController : MonoBehaviour
         }
 
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
 
-        if (rb == null)
+        if (agent == null)
         {
-            Debug.LogError("Rigidbody component missing from this game object");
+            Debug.LogError("NavMeshAgent component missing from this game object");
             return;
         }
-
-        rb.isKinematic = false;
-        rb.useGravity = true;
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         currentHealth = maxHealth;
         healthBar.SetHealth(currentHealth, maxHealth);
         lastAttackTime = -attackCooldown;
+
+        // Ajustar la posición del agente a la NavMesh
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, 1.0f, NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position);
+        }
+        else
+        {
+            Debug.LogError("Demon not placed on a valid NavMesh position.");
+            return;
+        }
     }
 
     private void Update()
@@ -72,44 +76,23 @@ public class DemonController : MonoBehaviour
 
     private void MoveTowardsPlayer()
     {
-        if (isStunned)
+        if (isStunned || !agent.isOnNavMesh)
         {
+            if (agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+            }
             return;
         }
 
         // Establecer el parámetro de animación para caminar
         animator.SetBool("Walking", true);
 
-        Vector3 direction = (player.position - transform.position).normalized;
-        Vector3[] raycastDirections = new Vector3[]
+        if (agent.isOnNavMesh)
         {
-            transform.forward,
-            transform.forward + transform.right,
-            transform.forward - transform.right
-            // Añade más direcciones según sea necesario para tu araña
-        };
-
-        foreach (Vector3 raycastDir in raycastDirections)
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
-            {
-                if (hit.collider.CompareTag("Wall"))
-                {
-                    // Calcular nueva dirección para evitar el obstáculo
-                    Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
-                    if (newDirection != Vector3.zero)
-                    {
-                        direction = newDirection;
-                        break; // Salir del bucle si se encontró una dirección válida
-                    }
-                }
-            }
+            agent.isStopped = false;
+            agent.SetDestination(player.position);
         }
-
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
     private void AttackPlayer()
@@ -144,7 +127,10 @@ public class DemonController : MonoBehaviour
         Debug.Log("Demon takes " + damage + " damage, health is now " + currentHealth);
 
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
-        rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+        if (agent.isOnNavMesh)
+        {
+            agent.velocity = knockbackDirection * knockbackForce;
+        }
 
         if (!isStunned)
         {
