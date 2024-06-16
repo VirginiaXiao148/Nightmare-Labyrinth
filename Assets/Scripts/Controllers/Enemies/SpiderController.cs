@@ -27,16 +27,25 @@ public class SpiderController : MonoBehaviour
     public float knockbackForce = 5f;
 
     public float obstacleAvoidanceDistance = 2.0f;
-    public LayerMask obstacleLayerMask;
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animation = GetComponent<Animation>();
+        
         rb = GetComponent<Rigidbody>();
+
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody component missing from this game object");
+            return;
+        }
+
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.drag = 1f;
+        rb.angularDrag = 0.5f;
 
         currentHealth = maxHealthSpider;
         healthBar.SetHealth(currentHealth, maxHealthSpider);

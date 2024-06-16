@@ -47,37 +47,40 @@ public class DemonController : MonoBehaviour
 
         rb.isKinematic = false;
         rb.useGravity = true;
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative; // Cambio aquí
+        rb.interpolation = RigidbodyInterpolation.Interpolate; // Suaviza el movimiento
+
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ; // Constrain rotations
 
         currentHealth = maxHealth;
-        healthBar.SetHealth(currentHealth, maxHealth);
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth, maxHealth);
+        }
         lastAttackTime = -attackCooldown;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (player == null)
         {
             return;
         }
 
-        MoveTowardsPlayer();
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+        if (!isStunned)
         {
-            AttackPlayer();
+            MoveTowardsPlayer();
+
+            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+            {
+                AttackPlayer();
+            }
         }
     }
 
     private void MoveTowardsPlayer()
     {
-        if (isStunned)
-        {
-            return;
-        }
-
-        // Establecer el parámetro de animación para caminar
         animator.SetBool("Walking", true);
 
         Vector3 direction = (player.position - transform.position).normalized;
@@ -95,12 +98,11 @@ public class DemonController : MonoBehaviour
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
-                    // Calcular nueva dirección para evitar el obstáculo
                     Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
                     if (newDirection != Vector3.zero)
                     {
                         direction = newDirection;
-                        break; // Salir del bucle si se encontró una dirección válida
+                        break;
                     }
                 }
             }
@@ -108,28 +110,20 @@ public class DemonController : MonoBehaviour
 
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        //transform.position += transform.forward * moveSpeed * Time.deltaTime;
-        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
+        rb.MovePosition(transform.position + direction * moveSpeed * Time.deltaTime);
     }
 
     private void AttackPlayer()
     {
-        if (isStunned || player == null)
-        {
-            return;
-        }
-
         Debug.Log("Player detected! Attacking...");
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
         if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
         {
-            Debug.Log("Hit: " + hit.collider.name);
             if (hit.collider.CompareTag("Player"))
             {
-                Debug.Log("Player in sight and hit by raycast");
                 animator.SetBool("Walking", false);
-                animator.SetBool("Punching1", true);
+                animator.SetTrigger("Punching1");
                 player.GetComponent<AricController>().TakeDamage(attackDamage);
                 lastAttackTime = Time.time;
             }
@@ -138,10 +132,12 @@ public class DemonController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        animator.SetBool("Stunned", true);
+        animator.SetTrigger("Stunned");
         currentHealth -= damage;
-        healthBar.SetHealth(currentHealth, maxHealth);
-        Debug.Log("Demon takes " + damage + " damage, health is now " + currentHealth);
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth, maxHealth);
+        }
 
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
@@ -162,13 +158,13 @@ public class DemonController : MonoBehaviour
         isStunned = true;
         yield return new WaitForSeconds(duration);
         isStunned = false;
-        animator.SetBool("Stunned", false);
+        animator.ResetTrigger("Stunned");
     }
 
     private void Die()
     {
         Debug.Log("Demon died!");
-        animator.SetBool("Dead", true);
+        animator.SetTrigger("Dead");
         gameObject.SetActive(false);
     }
 }
