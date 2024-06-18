@@ -1,235 +1,174 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-public class SpiderController : MonoBehaviour{
-
-    public float moveSpeed = 3f; // Speed of enemy movement
-    private Vector3 moveDirection; // Current movement direction of the enemy
-
-    private bool isStunned = false;
-
-    private float changeDirectionInterval = 2f; // Time interval to change movement direction
-    private float timer; // Timer to control direction change
-
-    public float maxHealthSpider = 30;
-    public Image healthBar; // Reference to the health bar image
-    public Text healthText; // Reference to the health text
+public class SpiderController : MonoBehaviour
+{
+    public float moveSpeed = 0.3f;
+    public float rotationSpeed = 5f;
+    public float detectionRadius = 10f;
 
     public float attackRange = 1.5f;
     public int attackDamage = 5;
-    public float attackCooldown = 2f; // Time between attacks
-    private float lastAttackTime; // Time of the last attack
+    public float attackCooldown = 2f;
+    private float lastAttackTime;
 
-    public string id;
+    public float maxHealthSpider = 30;
+    private float currentHealth;
+    public HealthBar healthBar;
 
-    public float fieldOfViewAngle = 90f; // Enemy's field of view angle (in degrees)
-    public float maxSightDistance = 10f; // Maximum distance at which the enemy can detect the player
+    private Transform player;
 
-    private float currentHealth; // Current health of the enemy
-
-    private Transform player; // Reference to the player's transform
-
-    private Animation animation; // Reference to the animation component
-
+    private Animation animation;
     private Rigidbody rb;
 
+    private bool isStunned = false;
+    public float knockbackForce = 5f;
 
-    // Start is called before the first frame update
-    void Start()
+    public float obstacleAvoidanceDistance = 2.0f;
+
+    private void Start()
     {
-
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        animation = GetComponent<Animation>();
+        
         rb = GetComponent<Rigidbody>();
+
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody component missing from this game object");
+            return;
+        }
+
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.drag = 1f;
+        rb.angularDrag = 0.5f;
 
-        id = System.Guid.NewGuid().ToString();
-
-        currentHealth = maxHealthSpider; // Initialize current health to maximum health
-        animation = GetComponent<Animation>(); // Get reference to the Animation component attached to this GameObject
-
-        player = GameObject.FindGameObjectWithTag("Player").transform; // Find and store a reference to the player's transform
-
-        // Initially, assign a random movement direction to the enemy
-        ChangeDirection();
-
-        Debug.Log("Current health "+currentHealth);
+        currentHealth = maxHealthSpider;
+        healthBar.SetHealth(currentHealth, maxHealthSpider);
     }
 
-    void Update(){
+    private void Update()
+    {
+        if (!isStunned)
+        {
+            MoveTowardsPlayer();
+            CheckForPlayer();
+        }
+    }
 
-        if (!isStunned) {
-            // Todo tu código de movimiento y seguimiento del jugador
-            timer += Time.deltaTime;
-            Vector3 newPosition = transform.position += moveDirection * moveSpeed * Time.deltaTime;
-            rb.MovePosition(newPosition);
-            if (timer >= changeDirectionInterval) {
-                ChangeDirection();
-                timer = 0f;
-            }
-
-            if (IsPlayerInSight()) {
-                float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-                if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown) {
-                    AttackPlayer();
-                } else if (distanceToPlayer > attackRange) {
-                    FollowPlayer();
-                }
-            }
+    private void MoveTowardsPlayer()
+    {
+        if (isStunned)
+        {
+            return;
         }
 
-        Debug.Log(getLife());
-        UpdateHealth();
-    }
-
-    string getLife(){
-        string txt = "Araña " + id + " y su vida es " + currentHealth;
-        return txt;
-    }
-
-    void UpdateHealth()
-    {
-        // Update the health bar
-        healthBar.fillAmount = (float) currentHealth / maxHealthSpider;
-        string txt = "Araña " + id + " y su vida es " + currentHealth.ToString();
-        // Update the health text
-        healthText.text = txt;
-    }
-
-    bool IsBlocked(Vector3 direction){
-        RaycastHit hit;
-        return Physics.Raycast(transform.position, direction, out hit, 2f) && hit.collider.CompareTag("Wall");
-    }
-    
-    // Change the enemy's movement direction to a random direction
-    void ChangeDirection()
-    {
-        // Check if the "Walk" animation is not playing
+        // Establecer el parámetro de animación para caminar
         if (!animation.IsPlaying("Walk"))
-        {
-            // If not playing, play the "Walk" animation
-            PlayWalkAnimation();
-        }
-
-        bool foundValidDirection = false;
-        Vector3 randomDirection = Vector3.zero;
-
-        // Keep searching for a valid direction until one is found
-        while (!foundValidDirection)
-        {
-            // Generate a new random direction in the XY plane (horizontal)
-            float randomX = Random.Range(-1f, 1f);
-            float randomZ = Random.Range(-1f, 1f);
-            randomDirection = new Vector3(randomX, 0f, randomZ).normalized;
-
-            if (!IsBlocked(randomDirection)){
-                foundValidDirection = true;
-            }
-        }
-
-        // Set the new direction of movement
-        moveDirection = randomDirection;
-        // Mover al enemigo en la dirección establecida a la velocidad configurada
-        //transform.position += moveDirection * moveSpeed * Time.deltaTime;
-
-        // Rotate the enemy to face the new direction
-        transform.rotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-    }
-
-
-
-    bool IsPlayerInSight()
-    {
-        // Direction from the spider to the player
-        Vector3 directionToPlayer = player.position - transform.position;
-
-        // Angle between the spider's forward direction and the direction to the player
-        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-
-        // Check if the player is within the spider's field of view angle and within sight range
-        if (angleToPlayer < fieldOfViewAngle / 2f)
-        {
-            // Cast a ray from the spider towards the player to check for obstructions
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, directionToPlayer, out hit, maxSightDistance))
             {
-                if (hit.collider.CompareTag("Player"))
+                PlayWalkAnimation();
+            }
+
+        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3[] raycastDirections = new Vector3[]
+        {
+            transform.forward,
+            transform.forward + transform.right,
+            transform.forward - transform.right
+        };
+
+        foreach (Vector3 raycastDir in raycastDirections)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, raycastDir, out hit, obstacleAvoidanceDistance))
+            {
+                if (hit.collider.CompareTag("Wall"))
                 {
-                    // The player is within the field of view and there are no obstructions, so the spider can see the player
-                    return true;
+                    // Calcular nueva dirección para evitar el obstáculo
+                    Vector3 newDirection = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                    if (newDirection != Vector3.zero)
+                    {
+                        direction = newDirection;
+                        break; // Salir del bucle si se encontró una dirección válida
+                    }
                 }
             }
         }
-        // The player is not within the field of view or is obstructed
-        return false;
+
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+        //transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        rb.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
     }
 
 
-    void FollowPlayer()
+    private void CheckForPlayer()
     {
-        if (!animation.IsPlaying("Run"))
+        if (player == null)
         {
-            // If "Run" animation is not playing, play it
-            PlayRunAnimation();
+            SceneManager.LoadScene("EndGame");
+            return;
         }
-        
-        Vector3 newPosition = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
-        rb.MovePosition(newPosition);
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown)
+        {
+            AttackPlayer();
+        }
     }
 
-
-    void AttackPlayer()
+    private void AttackPlayer()
     {
+        if (isStunned || player == null)
+        {
+            return;
+        }
+
+        GetComponent<Animation>().Stop();
+
+        Debug.Log("Player detected! Attacking...");
         Vector3 directionToPlayer = player.position - transform.position;
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, directionToPlayer, out hit, maxSightDistance))
+        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius))
         {
-            Debug.Log("Hit: " + hit.collider.name);  // Esto te dirá qué objeto está golpeando el raycast
+            Debug.Log("Hit: " + hit.collider.name);
             if (hit.collider.CompareTag("Player"))
             {
                 Debug.Log("Player in sight and hit by raycast");
-                // Play the attack animation
                 animation.Play("Attack");
-                // Deal damage to the player (you should call a function in the player's script to handle damage logic)
-                player.GetComponent<AricController1>().TakeDamage(attackDamage);
-                // Record the time of the last attack
+                player.GetComponent<AricController>().TakeDamage(attackDamage);
                 lastAttackTime = Time.time;
             }
         }
     }
 
-    private float knockbackForce = 5f; // Force of the knockback effect
-
-    // Function to handle when the enemy takes damage
     public void TakeDamage(float damage)
     {
-        // This stops all animations that are currently playing
         GetComponent<Animation>().Stop();
-        // Decrease the enemy's health by the specified damage amount
         currentHealth -= damage;
+        healthBar.SetHealth(currentHealth, maxHealthSpider);
         Debug.Log("Enemy takes " + damage + " damage, health is now " + currentHealth);
-        // Knockback the enemy when taking damage
-        // Calculate the knockback direction
+
         Vector3 knockbackDirection = (transform.position - player.position).normalized;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
 
-        if (!isStunned) {
-            Debug.Log("The enemy is stunned ");
-            StartCoroutine(StunEnemy(2.0f));  // Asumamos que el aturdimiento dura 2 segundos
+        if (!isStunned)
+        {
+            StartCoroutine(StunEnemy(2.0f));
         }
 
-        // Check if the enemy's health has reached zero or below
         if (currentHealth <= 0)
         {
-            Debug.Log("The enemy has no health left ");
-            // If health is zero or below, call the Die function
             Die();
         }
     }
 
-    private IEnumerator StunEnemy(float duration) {
+    private IEnumerator StunEnemy(float duration)
+    {
         isStunned = true;
         yield return new WaitForSeconds(duration);
         isStunned = false;
@@ -242,28 +181,22 @@ public class SpiderController : MonoBehaviour{
         StartCoroutine(DisableAfterAnimation(animation["Death"].length));
     }
 
-    IEnumerator DisableAfterAnimation(float delay)
+    private IEnumerator DisableAfterAnimation(float delay)
     {
-        // Espera durante la duración de la animación de muerte antes de proceder
         yield return new WaitForSeconds(delay);
-
-        // Desactiva el GameObject después de que la animación haya terminado
         gameObject.SetActive(false);
     }
 
-    // Method to play the walk animation
     public void PlayWalkAnimation()
     {
         animation.Play("Walk");
     }
 
-    // Method to play the run animation
     public void PlayRunAnimation()
     {
         animation.Play("Run");
     }
 
-    // Method to play the idle animation
     public void PlayIdleAnimation()
     {
         animation.Play("Idle");

@@ -1,76 +1,86 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController1 : MonoBehaviour
 {
-    public GameObject player; // Reference to the player GameObject
+    // El jugador que la cámara debe seguir
+    public Transform player;
 
-    public float distance = 2.0f; // Vector representing the distance between the camera and the player
+    // Offset de la cámara desde el jugador
+    public Vector3 offset;
 
-    public float rotationSpeed = 5f; // Speed at which the camera rotates
+    // Velocidad de seguimiento de la cámara
+    public float smoothSpeed = 0.125f;
 
-    public float speedH = 2;
-    public float speedV = 2;
+    // Sensibilidad del ratón para rotar la cámara
+    public float mouseSensitivity = 100f;
 
-    float yaw;
-    float pitch;
+    // Límites de la rotación vertical para evitar que la cámara gire completamente alrededor
+    public float minYAngle = -30f;
+    public float maxYAngle = 60f;
 
-    // Start is called before the first frame update
+    // Rotación acumulada en los ejes X e Y
+    private float verticalRotation = 0f;
+    private float horizontalRotation = 0f;
+
+    // Rotación objetivo acumulada
+    private Quaternion targetRotation;
+
     void Start()
     {
+        // Bloquear el cursor en el centro de la pantalla
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
-        Cursor.lockState = CursorLockMode.Locked; // Locks the cursor in the center of the screen
-        Cursor.visible = false; // Hides the cursor for a more immersive camera control
-
-        // Inicializa la rotación y posición de la cámara
-        yaw = transform.eulerAngles.y;
-        pitch = transform.eulerAngles.x;
-        
-        UpdateCameraPosition();
+        // Inicializar la rotación objetivo
+        targetRotation = transform.rotation;
     }
 
-    // LateUpdate is called after all Update functions have been called
-    void LateUpdate()
+    void Update()
     {
-        if (Cursor.lockState != CursorLockMode.Locked)
-        {
+        if (Cursor.lockState != CursorLockMode.Locked){
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-        // Rotate the camera
-        yaw += speedH * Input.GetAxis("Mouse X");
-        pitch -= speedV * Input.GetAxis("Mouse Y");
+        // Obtener la entrada del ratón
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Clampa el pitch para evitar vuelcos de la cámara
-        pitch = Mathf.Clamp(pitch, -89f, 89f);
+        // Ajustar la rotación horizontal
+        horizontalRotation += mouseX;
 
-        // Rotate the camera around the player
-        UpdateCameraPosition();
-        RotateCamera();
+        // Ajustar la rotación vertical y clamping para evitar giros completos
+        verticalRotation -= mouseY;
+        verticalRotation = Mathf.Clamp(verticalRotation, minYAngle, maxYAngle);
+
+        // Calcular la rotación objetivo acumulada
+        targetRotation = Quaternion.Euler(verticalRotation, horizontalRotation, 0f);
     }
 
-    void RotateCamera()
-{
-    // Obtener la entrada horizontal para la rotación del jugador
-    float rotationInput = Input.GetAxis("Horizontal");
-
-    // Calcular el ángulo de rotación basado en la entrada y la velocidad de rotación
-    float rotationAngle = rotationInput * rotationSpeed * Time.deltaTime;
-
-    // Rotar el jugador
-    player.transform.rotation = Quaternion.Euler(0, yaw, 0);
-
-    // Rotar la cámara alrededor del jugador si es necesario (opcional)
-    // transform.RotateAround(player.transform.position, Vector3.up, rotationAngle);
-}
-
-    void UpdateCameraPosition()
+    void LateUpdate()
     {
-        // Calcular la posición de la cámara usando coordenadas esféricas
-        Vector3 offset = new Vector3(0, 0, -distance);
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-        transform.position = player.transform.position + rotation * offset;
+        offset = new Vector3(0, 0.5f, 0.5f);
 
-        // Asegurarse de que la cámara siempre mire hacia el jugador
-        transform.LookAt(player.transform.position);
+        // Calcular la posición deseada de la cámara
+        Vector3 desiredPosition = player.position + targetRotation * offset;
+
+        // Ajustar la posición de la cámara con una interpolación suave
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        transform.position = smoothedPosition;
+
+        // Ajustar la rotación de la cámara con una interpolación suave
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, smoothSpeed);
+
+        // Asegurarse de que la cámara siempre mire al jugador
+        transform.LookAt(player.position + Vector3.up * offset.y);
+
+        // Hacer que el jugador mire en la dirección de la cámara (solo en el eje Y)
+        Vector3 lookDirection = transform.forward;
+        lookDirection.y = 0; // Mantener la dirección horizontal
+        if (lookDirection != Vector3.zero)
+        {
+            player.rotation = Quaternion.Lerp(player.rotation, Quaternion.LookRotation(lookDirection), smoothSpeed);
+        }
     }
 }
